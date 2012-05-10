@@ -1,5 +1,9 @@
 package in.company.letsmeet;
 
+/**
+ * @author pradeep
+ * Custom object to hold a contact and the selected value. Could have used a hashmap but for the required boolean isSelected.
+ */
 public class Contacts {
 	private String name;
 	private String phoneNumber;
