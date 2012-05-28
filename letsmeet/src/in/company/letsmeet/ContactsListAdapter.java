@@ -13,7 +13,7 @@ import android.widget.TextView;
 
 /**
  * @author pradeep
- * An implementation of Array adapter to display contact names and phone numbers with check boxes.
+ * An implementation of Array adapter to display contact names with check boxes.
  */
 public class ContactsListAdapter extends ArrayAdapter<Contacts> {
 	private final Activity context;

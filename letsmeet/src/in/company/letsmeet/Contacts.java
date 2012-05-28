@@ -8,6 +8,17 @@ public class Contacts {
 	private String name;
 	private String phoneNumber;
 	private boolean isSelected;
+	private String id;
+	private String location;
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	
 	
 	public String getName() {
 		return name;
@@ -15,6 +26,13 @@ public class Contacts {
 	
 	public void setName(String name) {
 		this.name = name;
+	}
+	public String getLocation() {
+		return location;
+	}
+	
+	public void setLocation(String id) {
+		this.location = id;
 	}
 	
 	public String getPhoneNumber() {

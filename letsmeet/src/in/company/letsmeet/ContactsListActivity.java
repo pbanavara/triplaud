@@ -1,18 +1,12 @@
 package in.company.letsmeet;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.ListActivity;
 import android.content.ContentResolver;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -28,46 +22,71 @@ import android.widget.Toast;
  */
 public class ContactsListActivity extends ListActivity {
 	private ArrayList<Contacts> values;
+	private static final int SMS_INTENT = 1;
+	private HttpConnectionHelper connectionHelper;
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		Cursor mCursor = getContacts();
 		startManagingCursor(mCursor);
 		values = new ArrayList<Contacts>();
-		ArrayList<String> tempValues = new ArrayList<String>();
 
+		//Parse the cursor and populate the ArrayList
 		while(mCursor.moveToNext()) {
 			String name = mCursor.getString(mCursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
-			//	String phoneNumber = getPhoneNumber(name);
+			String id = mCursor.getString(mCursor.getColumnIndex(ContactsContract.Contacts._ID));
 			Contacts contact = new Contacts();
 			contact.setName(name);
+			contact.setId(id);
 			contact.setSelected(false);
 			values.add(contact);
 		}
 
-		//Construct an adapter to display contact names with check boxes.
-
+		//Construct the custom adapter to display contact names with check boxes.
 		ArrayAdapter<Contacts> adapter = new ContactsListAdapter(this, values);
 		setListAdapter(adapter);
 		setContentView(R.layout.contactslist);
 	}
 
+	
+	/**
+	 * @param view
+	 * Called when the confirm button is clicked. Check for selected contacts objects in the Arraylist, copy them to a JSONArray and 
+	 * send to a HttpServer. Also send SMS messages to the selected contacts.
+	 */
 	public void sendSelectedContacts(View view) {
+		Intent smsIntent = new Intent(this, SendSms.class);
+		ArrayList<String> tempList = new ArrayList<String>();
 		try {
 			JSONArray selectedContacts = new JSONArray();
 			for(int i=0;i<values.size();++i) {
 				Contacts contact = values.get(i);
 				if(contact.isSelected()) {
 					String name = contact.getName();
-					String phoneNumber = getPhoneNumberForContact(name);
+					String id = contact.getId();
+					String phoneNumber = getPhoneNumberForContact(id);
+					String smsContact = name + "," + phoneNumber;
+					tempList.add(smsContact);
 					JSONObject newContact = new JSONObject();
 					newContact.put("NAME", contact.getName());
 					newContact.put("PHONE_NUMBER", phoneNumber);
+					newContact.put("LOC", "");
 					selectedContacts.put(newContact);
 				}
 			}
+			JSONObject finalObject = new JSONObject();
+			finalObject.put("MYID", Common.MY_ID);
+			finalObject.put("MYLOCATION", "12.974934355257243,77.6464695623548");
+			finalObject.put("FRIENDS", selectedContacts);
 			Log.i("ContactsList", String.valueOf(selectedContacts.length()));
-			testHttpConnection(selectedContacts);
+			smsIntent.putStringArrayListExtra("contacts", tempList);
+			//startActivityForResult(smsIntent, SMS_INTENT);
+			connectionHelper = new HttpConnectionHelper();
+			connectionHelper.postData(Common.URL, finalObject);
+			Intent mapIntent = new Intent(this, MapUs.class);
+			mapIntent.putExtra("myid", Common.MY_ID);
+			Thread.sleep(2000);
+			startActivity(mapIntent);
 		} catch (Exception je) {
 			je.printStackTrace();
 		}
@@ -75,6 +94,10 @@ public class ContactsListActivity extends ListActivity {
 		//this.finish();
 	}
 
+	/**
+	 * @return cursor
+	 * Return the phone contacts as a cursor
+	 */
 	private Cursor getContacts() {
 		Uri uri = ContactsContract.Contacts.CONTENT_URI;
 		String[] projection = new String[] { ContactsContract.Contacts._ID,
@@ -89,6 +112,12 @@ public class ContactsListActivity extends ListActivity {
 				sortOrder);
 	}
 
+	
+	/**
+	 * @param displayName
+	 * @return phoneNumber
+	 * Given a display name query and obtain the phone number.
+	 */
 	private String getPhoneNumberForContact(String displayName) {
 		String phoneNumber = new String("");
 		ContentResolver resolver = getContentResolver();
@@ -103,24 +132,6 @@ public class ContactsListActivity extends ListActivity {
 			e.printStackTrace();
 		}
 		return phoneNumber;
-	}
-
-	private void testHttpConnection(JSONArray data) {
-		try {
-			HttpClient client = new DefaultHttpClient();
-			String url = "http://ec2-122-248-211-48.ap-southeast-1.compute.amazonaws.com:8080";
-			String postUrl = url+ "?data=" + data;
-			HttpPost post = new HttpPost(postUrl);	
-			org.apache.http.HttpResponse response = client.execute(post);
-			BufferedReader rd = new BufferedReader(new InputStreamReader(
-					response.getEntity().getContent()));
-			String line = "";
-			while ((line = rd.readLine()) != null) {
-				System.out.println(line);
-			}
-		}catch(Exception e) {
-			e.printStackTrace();
-		}
 	}
 
 }

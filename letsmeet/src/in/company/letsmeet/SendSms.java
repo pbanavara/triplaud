@@ -5,18 +5,13 @@ package in.company.letsmeet;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.StringTokenizer;
 
 import android.app.Activity;
 import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.telephony.SmsManager;
 import android.util.Log;
-import android.widget.Toast;
 
 /**
  * @author pradeep
@@ -24,7 +19,7 @@ import android.widget.Toast;
  *
  */
 public class SendSms extends Activity {
-	private static final String message = "meet-me your friend has sent you sms";
+	private static final String message = "meet-me:";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -42,14 +37,14 @@ public class SendSms extends Activity {
 		ArrayList<String> contacts = extras.getStringArrayList("contacts");
 		if (contacts != null) {
 		Log.i(this.toString(), "Contacts ArrayList Obtained" + String.valueOf(contacts.size()));
-		Iterator iterator = contacts.iterator();
+		Iterator<String> iterator = contacts.iterator();
 		while(iterator.hasNext()) {
 			String[] name = ((String)iterator.next()).split(",");
 			String phoneNumber = name[1];
-			//String phoneNumber = "8095978063";
 			String cName = name[0];
 			Log.i(this.toString(), "Contact name" + cName + "Contact Number" + phoneNumber);
-			String newMessage = message + cName;
+			//String newMessage = message + phoneNumber;
+			String newMessage = message + "7890";
 			if(phoneNumber != null && phoneNumber.length()>0) {
 				sendSms(phoneNumber, newMessage);
 			}
