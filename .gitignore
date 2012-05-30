@@ -1,7 +1,7 @@
 # Compiled source #
 # ###################
  *.com
- *.class
+ letsmeet.*.class
  *.dll
  *.exe
  *.o

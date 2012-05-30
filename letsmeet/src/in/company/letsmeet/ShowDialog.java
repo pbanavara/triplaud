@@ -12,8 +12,11 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 
 
 public class ShowDialog extends Activity {
@@ -22,8 +25,12 @@ public class ShowDialog extends Activity {
 	private String sender;
 	private String myNumber;
 	private HttpConnectionHelper connectionHelper;
+	private LocationListener listener;
+	private WebView wv;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		setContentView(R.layout.mapus);
+		
 		// TODO Auto-generated method stub
 		sender = getIntent().getExtras().getString("sender");
 		myNumber = getIntent().getExtras().getString("mynumber");
@@ -54,17 +61,26 @@ public class ShowDialog extends Activity {
 		public void onClick(DialogInterface dialog, int which) {
 			try{
 				//Push the current location to the back-end server as a JSON object.
-				//String cLocation = getGpsData(getApplicationContext());
-				String cLocation = "12.97745,77.585875";
-				if (! cLocation.equals(NOGPS)) {
+				startLocationUpdates();
+				if (Common.currentLocation != null) {
 					connectionHelper = new HttpConnectionHelper();
 					JSONObject obj = new JSONObject();
 					obj.put("id", myNumber);
-					obj.put("loc", cLocation);
+					obj.put("loc", Common.currentLocation);
+					//obj.put("loc", "12.960298314609597,77.63908227742058");
 					connectionHelper.postData(Common.URL, obj);
-					Intent showMapIntent = new Intent(getApplicationContext(), MapUs.class);
-					showMapIntent.putExtra("myid", myNumber);
-					startActivity(showMapIntent);
+					wv = (WebView)findViewById(R.id.webView1);
+					wv.getSettings().setJavaScriptEnabled(true);
+					wv.loadUrl(Common.URL);	
+					wv = (WebView)findViewById(R.id.webView1);
+					wv.getSettings().setJavaScriptEnabled(true);
+					wv.loadUrl(Common.URL);
+					wv.setWebViewClient(new WebViewClient() {
+						public boolean shouldOverrideUrlLoading(WebView view, String url) {
+							view.loadUrl(url);
+							return false;
+						}
+					});
 
 				}
 			} catch(Exception e){
@@ -79,33 +95,22 @@ public class ShowDialog extends Activity {
 			ShowDialog.this.finish();
 		}
 	}
-
+	
 	/**
-	 * @param context
-	 * @return String containing the gps co-ordinates, NOGPS if unable to obtain GPS data
+	 * Fires off the GPS listener for gathering location updates.
 	 */
-	public String getGpsData(Context context) {
-		String latlon = "";
-		try {
-			LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-			List<String> providers = locationManager.getAllProviders();
-			// Add code to check if GPS is on and if it's not, provide a popup with the message 
-			// "Can we turn on and turn off the GPS just to get your location"
-			if(!providers.isEmpty()) {
-				if(locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) ){
-					Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-					double latitude = location.getLatitude();
-					double longitude = location.getLongitude();
-					latlon = new String(String.valueOf(latitude) + "," + String.valueOf(longitude));
-				} else {
-					//buildAlertMessageNoGps();
-					latlon = NOGPS;
-				}
+	public void startLocationUpdates() {
+		try{
+			Common.locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+			listener = new LocListener();
+			if(Common.locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+				Common.locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, listener);
+			} else if(Common.locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+				Common.locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, listener);
 			}
-		} catch (Exception e) {
+		}catch(Exception e) {
 			e.printStackTrace();
 		}
-		return latlon;
 	}
 }
 

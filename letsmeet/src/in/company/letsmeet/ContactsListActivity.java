@@ -1,20 +1,25 @@
 package in.company.letsmeet;
+
 import java.util.ArrayList;
+import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import android.app.ListActivity;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
-import android.widget.Toast;
 
 /**
  * @author pradeep
@@ -22,8 +27,10 @@ import android.widget.Toast;
  */
 public class ContactsListActivity extends ListActivity {
 	private ArrayList<Contacts> values;
-	private static final int SMS_INTENT = 1;
+	
 	private HttpConnectionHelper connectionHelper;
+	private LocationManager locationManager;
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -55,9 +62,8 @@ public class ContactsListActivity extends ListActivity {
 	 * send to a HttpServer. Also send SMS messages to the selected contacts.
 	 */
 	public void sendSelectedContacts(View view) {
-		Intent smsIntent = new Intent(this, SendSms.class);
-		ArrayList<String> tempList = new ArrayList<String>();
 		try {
+		ArrayList<String> tempList = new ArrayList<String>();
 			JSONArray selectedContacts = new JSONArray();
 			for(int i=0;i<values.size();++i) {
 				Contacts contact = values.get(i);
@@ -73,25 +79,27 @@ public class ContactsListActivity extends ListActivity {
 					newContact.put("LOC", "");
 					selectedContacts.put(newContact);
 				}
-			}
+			}	
 			JSONObject finalObject = new JSONObject();
 			finalObject.put("MYID", Common.MY_ID);
-			finalObject.put("MYLOCATION", "12.974934355257243,77.6464695623548");
+			//finalObject.put("MYLOCATION", getGpsData(getApplicationContext()));
+			finalObject.put("MYLOCATION", Common.currentLocation);
 			finalObject.put("FRIENDS", selectedContacts);
 			Log.i("ContactsList", String.valueOf(selectedContacts.length()));
-			smsIntent.putStringArrayListExtra("contacts", tempList);
-			//startActivityForResult(smsIntent, SMS_INTENT);
 			connectionHelper = new HttpConnectionHelper();
 			connectionHelper.postData(Common.URL, finalObject);
+			Intent smsIntent = new Intent(this, SendSms.class);
+			smsIntent.putStringArrayListExtra("contacts", tempList);
+			startActivity(smsIntent);
+			
 			Intent mapIntent = new Intent(this, MapUs.class);
 			mapIntent.putExtra("myid", Common.MY_ID);
-			Thread.sleep(2000);
-			startActivity(mapIntent);
+			//startActivity(mapIntent);
+			
 		} catch (Exception je) {
 			je.printStackTrace();
 		}
-		Toast.makeText(getApplicationContext(), "Your cntacts have been sent", Toast.LENGTH_SHORT);
-		//this.finish();
+		
 	}
 
 	/**
@@ -133,5 +141,5 @@ public class ContactsListActivity extends ListActivity {
 		}
 		return phoneNumber;
 	}
-
+	
 }

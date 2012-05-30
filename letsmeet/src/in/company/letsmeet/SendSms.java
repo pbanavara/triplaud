@@ -12,6 +12,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.telephony.SmsManager;
 import android.util.Log;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 
 /**
  * @author pradeep
@@ -20,20 +22,26 @@ import android.util.Log;
  */
 public class SendSms extends Activity {
 	private static final String message = "meet-me:";
-
+	private WebView wv;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.mapus);
+		wv = (WebView)findViewById(R.id.webView1);
+		wv.getSettings().setJavaScriptEnabled(true);
+		wv.loadUrl(Common.URL);	
+		wv = (WebView)findViewById(R.id.webView1);
+		wv.getSettings().setJavaScriptEnabled(true);
+		wv.loadUrl(Common.URL);
+		wv.setWebViewClient(new WebViewClient() {
+			public boolean shouldOverrideUrlLoading(WebView view, String url) {
+				view.loadUrl(url);
+				return false;
+			}
+		});
+		
 		Bundle extras = getIntent().getExtras();
-		//For the reply message
-		String replyMessage = getIntent().getExtras().getString("replymessage");
-		String replyPhoneNumber = getIntent().getExtras().getString("replyphonenumber");
-		if(replyPhoneNumber != "" && replyPhoneNumber != null) {
-			sendSms(replyPhoneNumber, replyMessage);
-		}
-		//For the originating message
 		ArrayList<String> contacts = extras.getStringArrayList("contacts");
 		if (contacts != null) {
 		Log.i(this.toString(), "Contacts ArrayList Obtained" + String.valueOf(contacts.size()));
@@ -43,8 +51,8 @@ public class SendSms extends Activity {
 			String phoneNumber = name[1];
 			String cName = name[0];
 			Log.i(this.toString(), "Contact name" + cName + "Contact Number" + phoneNumber);
-			//String newMessage = message + phoneNumber;
-			String newMessage = message + "7890";
+			String newMessage = message + phoneNumber;
+			
 			if(phoneNumber != null && phoneNumber.length()>0) {
 				sendSms(phoneNumber, newMessage);
 			}
@@ -81,5 +89,4 @@ public class SendSms extends Activity {
 		super.onDestroy();
 	}
 	
-
 }

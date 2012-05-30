@@ -1,0 +1,93 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+<meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+<link rel="stylesheet" href="http://code.leafletjs.com/leaflet-0.3.1/leaflet.css" />
+<title>Plotting parse points</title>
+<script src="http://code.leafletjs.com/leaflet-0.3.1/leaflet.js"></script>
+<script type="text/javascript">
+var map,cloudmadeAttrib,cloudmadeUrl,cloudmadeAttribution,cloudmade;
+var mapCenter = new L.LatLng(12.970214, 77.56029); //Default the map Center to  Bangalore
+var markerData = [];
+
+function getUrlVars()
+{
+    var vars = [], hash;
+    var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+    for(var i = 0; i < hashes.length; i++)
+    {
+        hash = hashes[i].split('=');
+        vars.push(hash[0]);
+        vars[hash[0]] = hash[1];
+    }
+    return vars;
+}
+
+function initializeMap() {
+  map = new L.Map('map');
+  cloudmadeAttrib = 'Data, imagery and map information provided by <a href="http://open.mapquest.co.uk" target="_blank">MapQuest</a>, <a href="http://www.openstreetmap.org/" target="_blank">OpenStreetMap</a> and contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/" target="_blank">CC-BY-SA</a>';
+
+  cloudmadeUrl = 'http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/22677/256/{z}/{x}/{y}.png';
+  cloudmadeAttribution = 'Map data &copy; 2011 OpenStreetMap contributors, Imagery &copy; 2011 CloudMade';
+  cloudmade = new L.TileLayer(cloudmadeUrl, {maxZoom: 18, attribution: cloudmadeAttribution});
+  map.setView(mapCenter,12).addLayer(cloudmade);
+  displayTaxiPoints();
+
+}
+
+/*
+ * Integration with foursquare API. Ignore for the time bieng.
+ */
+function getDataFromFs(url) {
+  var xhr = new XMLHttpRequest();
+  xhr.open("GET", url, true);
+  xhr.setRequestHeader("Content-Type", "application/json");
+  xhr.send();
+  xhr.onreadystatechange = function() {
+    if (xhr.readyState == 4) {
+      var result = JSON.parse(xhr.responseText);
+      alert(result);
+    }
+  }
+
+}
+
+
+/*
+ * Display the data points using markers on a leaflet based UI
+ */
+function displayTaxiPoints() {
+    var fsUrl = 'https://api.foursquare.com/v2/venues/explore?ll=12.959840681934615,77.64945907313533&section=coffee&oauth_token=4ENF4MW3PJMMUPS5D5FJC1OP5WXRVF2FFAZCMFG1PDSLBRAH&v=20120516';
+  //  getDataFromFs(fsUrl);
+ var NewIcon = L.Icon.extend({
+    iconUrl: 'customImages/purpleIcon.png',
+  });
+ var purpleIcon = new NewIcon();
+ var pIcon = L.Icon.extend({
+    iconUrl: 'customImages/greenIcon.png',
+  });
+ var greenIcon = new pIcon();
+  var marker;
+  var data = getUrlVars();
+  for(var index=0;index<data.length;++index){
+    var latlong = data['locations'].split(":");
+    if(latlong !== undefined) {
+			for(var ind=0;ind < latlong.length;ind++) {
+	    	var latt = latlong[ind].split(",");
+	    	var lat = latt[0];
+	    	var lon = latt[1];
+	    	var latLng = new L.LatLng(lat,lon);
+	    marker = new L.Marker(latLng);
+	    map.addLayer(marker);
+   		} 
+		}
+ }
+}
+
+</script>
+<body onLoad="initializeMap()"> 
+<div id="map" style="height: 800px"></div>
+</body>
+</head>
+</html>
