@@ -10,20 +10,18 @@ import android.util.Log;
  * Location listener implementation, upload data to parse every time the listener is invoked.
  */
 public class LocListener implements LocationListener {
-	private String loc;
 	
-	public String getLoc() {
-		return this.loc;
-	}
 	
 	@Override
 	public void onLocationChanged(Location location) {
 		// TODO Auto-generated method stub
 		try{
-			Common.currentLocation = new String(String.valueOf(location.getLatitude()) + "," + String.valueOf(location.getLongitude()));
-			Log.i("LocListener",Common.currentLocation);
+			Common.setLocation(new String(String.valueOf(location.getLatitude()) + "," + String.valueOf(location.getLongitude())));
+			Log.i("LocListener",Common.getLocation());	
+			Common.locationManager.removeUpdates(this);
+			Common.locationManager = null;
 		} catch(Exception e) {
-				e.printStackTrace();
+			e.printStackTrace();
 		}
 
 	}

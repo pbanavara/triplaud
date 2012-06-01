@@ -1,18 +1,15 @@
 package in.company.letsmeet;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import android.app.ListActivity;
 import android.content.ContentResolver;
-import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -27,9 +24,7 @@ import android.widget.ArrayAdapter;
  */
 public class ContactsListActivity extends ListActivity {
 	private ArrayList<Contacts> values;
-	
 	private HttpConnectionHelper connectionHelper;
-	private LocationManager locationManager;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -83,7 +78,12 @@ public class ContactsListActivity extends ListActivity {
 			JSONObject finalObject = new JSONObject();
 			finalObject.put("MYID", Common.MY_ID);
 			//finalObject.put("MYLOCATION", getGpsData(getApplicationContext()));
-			finalObject.put("MYLOCATION", Common.currentLocation);
+			String newLoc = Common.getLocation();
+			if(newLoc == null) {
+				Location location = Common.locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+				newLoc = String.valueOf(location.getLatitude()) + "," + String.valueOf(location.getLongitude());
+			}
+			finalObject.put("MYLOCATION", newLoc);
 			finalObject.put("FRIENDS", selectedContacts);
 			Log.i("ContactsList", String.valueOf(selectedContacts.length()));
 			connectionHelper = new HttpConnectionHelper();

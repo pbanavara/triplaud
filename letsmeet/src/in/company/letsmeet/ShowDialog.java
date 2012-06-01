@@ -1,7 +1,5 @@
 package in.company.letsmeet;
 
-import java.util.List;
-
 import org.json.JSONObject;
 
 import android.app.Activity;
@@ -10,8 +8,6 @@ import android.app.AlertDialog.Builder;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
@@ -21,7 +17,7 @@ import android.webkit.WebViewClient;
 
 public class ShowDialog extends Activity {
 	private static final int DIALOG_ALERT = 10;
-	private static final String NOGPS = "NO GPS";
+
 	private String sender;
 	private String myNumber;
 	private HttpConnectionHelper connectionHelper;
@@ -62,11 +58,11 @@ public class ShowDialog extends Activity {
 			try{
 				//Push the current location to the back-end server as a JSON object.
 				startLocationUpdates();
-				if (Common.currentLocation != null) {
+				if (Common.getLocation() != null) {
 					connectionHelper = new HttpConnectionHelper();
 					JSONObject obj = new JSONObject();
 					obj.put("id", myNumber);
-					obj.put("loc", Common.currentLocation);
+					obj.put("loc", Common.getLocation());
 					//obj.put("loc", "12.960298314609597,77.63908227742058");
 					connectionHelper.postData(Common.URL, obj);
 					wv = (WebView)findViewById(R.id.webView1);

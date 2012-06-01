@@ -2,7 +2,6 @@ package in.company.letsmeet;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.util.Log;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -19,6 +18,7 @@ public class MapUs extends Activity {
 		wv.getSettings().setJavaScriptEnabled(true);
 		wv.loadUrl(Common.URL);
 		wv.setWebViewClient(new WebViewClient() {
+			@Override
 			public boolean shouldOverrideUrlLoading(WebView view, String url) {
 				view.loadUrl(url);
 				return false;

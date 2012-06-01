@@ -10,6 +10,7 @@
 var map,cloudmadeAttrib,cloudmadeUrl,cloudmadeAttribution,cloudmade;
 var mapCenter = new L.LatLng(12.970214, 77.56029); //Default the map Center to  Bangalore
 var markerData = [];
+var fsData = {};
 
 function getUrlVars()
 {
@@ -39,15 +40,15 @@ function initializeMap() {
 /*
  * Integration with foursquare API. Ignore for the time bieng.
  */
-function getDataFromFs(url) {
+function getDataFromFs(url, getData) {
   var xhr = new XMLHttpRequest();
   xhr.open("GET", url, true);
-  xhr.setRequestHeader("Content-Type", "application/json");
+  //xhr.setRequestHeader("Content-Type", "application/json");
   xhr.send();
   xhr.onreadystatechange = function() {
     if (xhr.readyState == 4) {
-      var result = JSON.parse(xhr.responseText);
-      alert(result);
+       var tempData = JSON.parse(xhr.responseText);
+        getData(tempData);
     }
   }
 
@@ -58,8 +59,6 @@ function getDataFromFs(url) {
  * Display the data points using markers on a leaflet based UI
  */
 function displayTaxiPoints() {
-    var fsUrl = 'https://api.foursquare.com/v2/venues/explore?ll=12.959840681934615,77.64945907313533&section=coffee&oauth_token=4ENF4MW3PJMMUPS5D5FJC1OP5WXRVF2FFAZCMFG1PDSLBRAH&v=20120516';
-  //  getDataFromFs(fsUrl);
  var NewIcon = L.Icon.extend({
     iconUrl: 'customImages/purpleIcon.png',
   });
@@ -70,19 +69,39 @@ function displayTaxiPoints() {
  var greenIcon = new pIcon();
   var marker;
   var data = getUrlVars();
+  var averageLat = 0.0;
+  var averageLon = 0.0;
   for(var index=0;index<data.length;++index){
     var latlong = data['locations'].split(":");
     if(latlong !== undefined) {
-			for(var ind=0;ind < latlong.length;ind++) {
+	for(var ind=0;ind < latlong.length;++ind) {
 	    	var latt = latlong[ind].split(",");
 	    	var lat = latt[0];
 	    	var lon = latt[1];
+		averageLat = (parseFloat(averageLat) + parseFloat(lat)) / (ind +1)
+		averageLon = (parseFloat(averageLon) + parseFloat(lon)) / (ind +1)
 	    	var latLng = new L.LatLng(lat,lon);
 	    marker = new L.Marker(latLng);
 	    map.addLayer(marker);
-   		} 
-		}
+   	} 
+	}
+ } 
+    var fsUrl = 'https://api.foursquare.com/v2/venues/explore?client_id=N3RMDIQFPLHPLTJMRKLNV4ULXJCXWOPY3HZ2EOMXBSJWU1SW&client_secret=EQKC52S2W5RP1N2CQYQ2CPM1H55PISXUE41UIG55LEJQSDTY&section=coffee&oauth_token=4ENF4MW3PJMMUPS5D5FJC1OP5WXRVF2FFAZCMFG1PDSLBRAH&v=20120516&limit=4&ll=' + averageLat + ',' + averageLon ;
+   getDataFromFs(fsUrl, function(temp) {
+ var resp = temp.response;
+ var venLen = resp.groups.length;
+ var groups = resp.groups;
+ for(var fsI = 0; fsI < venLen; ++fsI ) {
+	var items = groups[fsI].items;
+        for(var it=0;it<items.length;++it) {
+	var fsLat = items[it].venue.location.lat;	
+	var fsLon = items[it].venue.location.lng;	
+	var fslatLng = new L.LatLng(fsLat,fsLon);
+	marker = new L.Marker(fslatLng, {icon:purpleIcon});
+	map.addLayer(marker);
+        }
  }
+});
 }
 
 </script>
