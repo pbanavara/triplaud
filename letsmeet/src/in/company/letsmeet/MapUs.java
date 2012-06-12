@@ -14,7 +14,7 @@ public class MapUs extends Activity {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.mapus);
-		wv = (WebView)findViewById(R.id.webView1);
+		//wv = (WebView)findViewById(R.id.webView1);
 		wv.getSettings().setJavaScriptEnabled(true);
 		wv.loadUrl(Common.URL);
 		wv.setWebViewClient(new WebViewClient() {

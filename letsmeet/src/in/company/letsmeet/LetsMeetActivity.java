@@ -14,14 +14,14 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
-public class LetsMeetActivity extends Activity implements LocationListener{
-	private LocationListener listener;
+public class LetsMeetActivity extends Activity {
+	
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.main);
-		startLocationUpdates();
+		setContentView(R.layout.meet);
+		
 		Spinner spin = (Spinner)findViewById(R.id.spinner1);
 		String[] occasions = {"A drink", "Coffee", "Lunch", "Dinner"};
 		ArrayAdapter ap = new ArrayAdapter(this, android.R.layout.simple_spinner_item,occasions);
@@ -35,48 +35,7 @@ public class LetsMeetActivity extends Activity implements LocationListener{
 		startActivity(intent);
 	}
 
-	public void startLocationUpdates() {
-		try{
-			Common.locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-			
-			listener = new LocListener();
-			if(Common.locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-				Common.locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
-			} else if(Common.locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
-				/*
-				Location location = Common.locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-				String tempLoc = String.valueOf(location.getLatitude()) + "," + String.valueOf(location.getLongitude());
-				Common.setLocation(tempLoc);
-				*/
-				Common.locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, listener);
-			}
-		}catch(Exception e) {
-			e.printStackTrace();
-		}
-	}
+	
 
-	@Override
-	public void onLocationChanged(Location arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void onProviderDisabled(String provider) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void onProviderEnabled(String provider) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void onStatusChanged(String provider, int status, Bundle extras) {
-		// TODO Auto-generated method stub
-		
-	}
-
+	
 }

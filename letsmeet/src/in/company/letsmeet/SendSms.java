@@ -8,41 +8,33 @@ import java.util.Iterator;
 
 import android.app.Activity;
 import android.app.PendingIntent;
+import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.telephony.SmsManager;
 import android.util.Log;
+import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Button;
 
 /**
  * @author pradeep
  * Activity class for sending SMS
  *
  */
-public class SendSms extends Activity {
+public class SendSms {
 	private static final String message = "meet-me:";
 	private WebView wv;
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.mapus);
-		wv = (WebView)findViewById(R.id.webView1);
-		wv.getSettings().setJavaScriptEnabled(true);
-		wv.loadUrl(Common.URL);	
-		wv = (WebView)findViewById(R.id.webView1);
-		wv.getSettings().setJavaScriptEnabled(true);
-		wv.loadUrl(Common.URL);
-		wv.setWebViewClient(new WebViewClient() {
-			public boolean shouldOverrideUrlLoading(WebView view, String url) {
-				view.loadUrl(url);
-				return false;
-			}
-		});
-		
-		Bundle extras = getIntent().getExtras();
-		ArrayList<String> contacts = extras.getStringArrayList("contacts");
+	private Context context;
+	
+	public SendSms(Context context) {
+		this.context = context;
+	}
+	
+	public void sendBulkSms(ArrayList<String> contacts) {
 		if (contacts != null) {
 		Log.i(this.toString(), "Contacts ArrayList Obtained" + String.valueOf(contacts.size()));
 		Iterator<String> iterator = contacts.iterator();
@@ -63,9 +55,38 @@ public class SendSms extends Activity {
 		
 	}
 	
+		/*
+		wv = (WebView)findViewById(R.id.webView1);
+		wv.getSettings().setJavaScriptEnabled(true);
+		wv.loadUrl(Common.URL);	
+		wv = (WebView)findViewById(R.id.webView1);
+		wv.getSettings().setJavaScriptEnabled(true);
+		wv.getSettings().setBuiltInZoomControls(true);
+		
+		wv.setWebViewClient(new WebViewClient() {
+			public boolean shouldOverrideUrlLoading(WebView view, String url) {
+				view.loadUrl(url);
+				return false;
+			}
+		});
+		wv.loadUrl(Common.URL);	
+		Button viewButton = (Button)findViewById(R.id.mapButton);
+		viewButton.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				wv.loadUrl(Common.URL);
+				
+			}
+		});
+		*/
+	
+	
 	private void sendSms(String phoneNumber, String message) {
+		
 		String SENT = "SMS_SENT";
-		PendingIntent sentIntent = PendingIntent.getBroadcast(this, 0, new Intent(SENT), 0);
+		PendingIntent sentIntent = PendingIntent.getBroadcast(context, 0, new Intent(SENT), 0);
 		/*
 		registerReceiver(new BroadcastReceiver() {
 			public void onReceive(Context arg0, Intent arg1) {
@@ -83,10 +104,4 @@ public class SendSms extends Activity {
 		sms.sendTextMessage(phoneNumber, null, message, sentIntent, null);	
 	}
 
-	@Override
-	protected void onDestroy() {
-		// TODO Auto-generated method stub
-		super.onDestroy();
-	}
-	
 }

@@ -1,9 +1,16 @@
 package in.company.letsmeet;
 
+import in.company.letsmeet.locationutil.BestLocationFinder;
+
 import java.util.ArrayList;
+import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import com.google.android.maps.GeoPoint;
+import com.google.android.maps.MapView;
+import com.google.android.maps.OverlayItem;
 
 import android.app.ListActivity;
 import android.content.ContentResolver;
@@ -23,6 +30,7 @@ import android.widget.ArrayAdapter;
  * Activity class to display the contact names and the phone numbers.
  */
 public class ContactsListActivity extends ListActivity {
+	private static final String TAG = "ContactsListActivity";
 	private ArrayList<Contacts> values;
 	private HttpConnectionHelper connectionHelper;
 	
@@ -57,6 +65,7 @@ public class ContactsListActivity extends ListActivity {
 	 * send to a HttpServer. Also send SMS messages to the selected contacts.
 	 */
 	public void sendSelectedContacts(View view) {
+		BestLocationFinder finder;
 		try {
 		ArrayList<String> tempList = new ArrayList<String>();
 			JSONArray selectedContacts = new JSONArray();
@@ -78,23 +87,21 @@ public class ContactsListActivity extends ListActivity {
 			JSONObject finalObject = new JSONObject();
 			finalObject.put("MYID", Common.MY_ID);
 			//finalObject.put("MYLOCATION", getGpsData(getApplicationContext()));
-			String newLoc = Common.getLocation();
-			if(newLoc == null) {
-				Location location = Common.locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-				newLoc = String.valueOf(location.getLatitude()) + "," + String.valueOf(location.getLongitude());
-			}
+			finder = new BestLocationFinder(getApplicationContext());
+			Location location = finder.getLastBestLocation(System.currentTimeMillis());
+			String newLoc = location.getLatitude() + "," + location.getLongitude();
 			finalObject.put("MYLOCATION", newLoc);
 			finalObject.put("FRIENDS", selectedContacts);
 			Log.i("ContactsList", String.valueOf(selectedContacts.length()));
 			connectionHelper = new HttpConnectionHelper();
 			connectionHelper.postData(Common.URL, finalObject);
-			Intent smsIntent = new Intent(this, SendSms.class);
-			smsIntent.putStringArrayListExtra("contacts", tempList);
-			startActivity(smsIntent);
 			
-			Intent mapIntent = new Intent(this, MapUs.class);
-			mapIntent.putExtra("myid", Common.MY_ID);
-			//startActivity(mapIntent);
+			SendSms sendSms = new SendSms(getApplicationContext());
+			//sendSms.sendBulkSms(tempList);
+			Intent mapIntent = new Intent(this, CommonMapActivity.class);
+			//mapIntent.putExtra("locations", obtainedLocations);
+			startActivity(mapIntent);
+			
 			
 		} catch (Exception je) {
 			je.printStackTrace();

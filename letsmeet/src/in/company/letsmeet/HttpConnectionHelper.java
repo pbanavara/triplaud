@@ -12,11 +12,14 @@ import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HTTP;
 import org.json.JSONObject;
 
+import android.util.Log;
+
 /**
  * @author pradeep
  * Helper class to send Http get/post requests.
  */
 public class HttpConnectionHelper {
+	private static final String TAG = "HttpConnectionHelper";
 	
 	public void postData(String url, JSONObject object) {
 		try {
@@ -37,21 +40,27 @@ public class HttpConnectionHelper {
 		}
 	}
 	
-	public void getData(String url) {
+	public String getData(String url) {
+	String newLine = "";
 	try{
+		Log.i(TAG, "In Get Request");
 		HttpClient client = new DefaultHttpClient();
 		HttpGet getRequest = new HttpGet(url);
+		getRequest.setHeader(HTTP.CONTENT_TYPE, "application/json");
 		org.apache.http.HttpResponse response = client.execute(getRequest);
 		BufferedReader rd = new BufferedReader(new InputStreamReader(
 				response.getEntity().getContent()));
 		String line = "";
+		
 		while ((line = rd.readLine()) != null) {
-			System.out.println(line);
+			newLine = line.concat(line);
 		}
+		
+		return newLine;
 	}catch(Exception e) {
 		e.printStackTrace();
 	}
-		
+	return newLine;
 	}
 
 }

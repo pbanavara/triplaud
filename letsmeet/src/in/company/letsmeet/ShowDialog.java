@@ -1,5 +1,7 @@
 package in.company.letsmeet;
 
+import in.company.letsmeet.locationutil.BestLocationFinder;
+
 import org.json.JSONObject;
 
 import android.app.Activity;
@@ -8,14 +10,17 @@ import android.app.AlertDialog.Builder;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Button;
 
 
-public class ShowDialog extends Activity {
+public class ShowDialog extends CommonMapActivity {
 	private static final int DIALOG_ALERT = 10;
 
 	private String sender;
@@ -25,19 +30,16 @@ public class ShowDialog extends Activity {
 	private WebView wv;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		setContentView(R.layout.mapus);
-		
+	
 		// TODO Auto-generated method stub
 		sender = getIntent().getExtras().getString("sender");
 		myNumber = getIntent().getExtras().getString("mynumber");
 		super.onCreate(savedInstanceState);
-		//	setContentView(R.layout.showdialog);
 		showDialog(DIALOG_ALERT);
 
 	}
 
 	protected Dialog onCreateDialog(int id) {
-
 		String formatString = "Your friend " + sender + " wants you to meet him, do you want to share your location" ;
 		switch (id) {
 		case DIALOG_ALERT:
@@ -57,14 +59,15 @@ public class ShowDialog extends Activity {
 		public void onClick(DialogInterface dialog, int which) {
 			try{
 				//Push the current location to the back-end server as a JSON object.
-				startLocationUpdates();
-				if (Common.getLocation() != null) {
+					BestLocationFinder finder = new BestLocationFinder(getApplicationContext());
+					Location loc = finder.getLastBestLocation(System.currentTimeMillis());
+					String locString = String.valueOf(loc.getLatitude()) + "," + String.valueOf(loc.getLongitude());
 					connectionHelper = new HttpConnectionHelper();
 					JSONObject obj = new JSONObject();
 					obj.put("id", myNumber);
-					obj.put("loc", Common.getLocation());
-					//obj.put("loc", "12.960298314609597,77.63908227742058");
+					obj.put("loc", locString);
 					connectionHelper.postData(Common.URL, obj);
+					/*
 					wv = (WebView)findViewById(R.id.webView1);
 					wv.getSettings().setJavaScriptEnabled(true);
 					wv.loadUrl(Common.URL);	
@@ -77,8 +80,19 @@ public class ShowDialog extends Activity {
 							return false;
 						}
 					});
+					Button viewButton = (Button)findViewById(R.id.mapButton);
+					viewButton.setOnClickListener(new View.OnClickListener() {
+						
+						@Override
+						public void onClick(View v) {
+							// TODO Auto-generated method stub
+							wv.loadUrl(Common.URL);
+							
+						}
+					});
+					*/
 
-				}
+				
 			} catch(Exception e){
 				e.printStackTrace();
 			}
