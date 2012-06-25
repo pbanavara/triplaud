@@ -9,7 +9,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:text="Letsmeet is an application that makes it convenient to schedule group meetings and get togethers. Organizers and attendees can see each other on the map and select the places of interest without making any phone call"
+        android:text="SocialEyez is an application that makes it convenient to schedule group meetings and get togethers. Organizers and attendees can see each other on the map and select the places of interest without making any phone calls"
         android:textAppearance="?android:attr/textAppearanceMedium" />
     
     <TextView

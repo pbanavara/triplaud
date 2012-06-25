@@ -10,6 +10,7 @@ import android.app.AlertDialog.Builder;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -67,31 +68,8 @@ public class ShowDialog extends CommonMapActivity {
 					obj.put("id", myNumber);
 					obj.put("loc", locString);
 					connectionHelper.postData(Common.URL, obj);
-					/*
-					wv = (WebView)findViewById(R.id.webView1);
-					wv.getSettings().setJavaScriptEnabled(true);
-					wv.loadUrl(Common.URL);	
-					wv = (WebView)findViewById(R.id.webView1);
-					wv.getSettings().setJavaScriptEnabled(true);
-					wv.loadUrl(Common.URL);
-					wv.setWebViewClient(new WebViewClient() {
-						public boolean shouldOverrideUrlLoading(WebView view, String url) {
-							view.loadUrl(url);
-							return false;
-						}
-					});
-					Button viewButton = (Button)findViewById(R.id.mapButton);
-					viewButton.setOnClickListener(new View.OnClickListener() {
-						
-						@Override
-						public void onClick(View v) {
-							// TODO Auto-generated method stub
-							wv.loadUrl(Common.URL);
-							
-						}
-					});
-					*/
-
+					Intent mapIntent = new Intent(getApplicationContext(), CommonMapActivity.class);
+					startActivity(mapIntent);
 				
 			} catch(Exception e){
 				e.printStackTrace();

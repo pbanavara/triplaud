@@ -12,6 +12,7 @@ public final class Common {
  public static LocationManager locationManager;
  public static Context context;
  public static final String DIRECTIONS_URL = "http://maps.googleapis.com/maps/api/directions/json?";
+ public static final String FOURSQUARE_URL = "https://api.foursquare.com/v2/venues/explore?client_id=N3RMDIQFPLHPLTJMRKLNV4ULXJCXWOPY3HZ2EOMXBSJWU1SW&client_secret=EQKC52S2W5RP1N2CQYQ2CPM1H55PISXUE41UIG55LEJQSDTY&section=coffee&oauth_token=4ENF4MW3PJMMUPS5D5FJC1OP5WXRVF2FFAZCMFG1PDSLBRAH&v=20120516&limit=4&intent=browse&radius=2000&ll=";
  
  public static void setLocation(String location) {
 	 currentLocation = location;

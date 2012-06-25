@@ -8,29 +8,69 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.util.Log;
-import android.webkit.WebView;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.ItemizedOverlay;
+import com.google.android.maps.MapView;
 import com.google.android.maps.OverlayItem;
+import com.google.android.maps.MapView.LayoutParams;
 
+/**
+ * @author pradeep
+ *
+ * @param <Item>
+ * Customization of ItemizedOerlay to populate icons. The implementation has some known bugs.
+ * Refer to this URL on how these are rectified.
+ * http://developmentality.wordpress.com/2009/10/19/android-itemizedoverlay-arrayindexoutofboundsexception-nullpointerexception-workarounds/#comment-815
+ */
 public class MapItemizedOverlay<Item> extends ItemizedOverlay<OverlayItem> {
 	private static final String TAG = "MapItemizedOverlay";
 	private ArrayList<OverlayItem> items = new ArrayList<OverlayItem>();
 	private Context context;
 	private GeoPoint tappedPoint;
+	private Drawable fsMarker;
+	private View view;
+	
 	public MapItemizedOverlay(Drawable defaultMarker) {
 		super(boundCenterBottom(defaultMarker));
 		// TODO Auto-generated constructor stub
 	}
 	
+	@Override
+	public boolean draw(Canvas canvas, MapView mapView, boolean shadow,
+			long when) {
+		// TODO Auto-generated method stub
+		return super.draw(canvas, mapView, shadow, when);
+	}
+
 	public MapItemizedOverlay(Drawable defaultMarker, Context context) {
 		super(boundCenterBottom(defaultMarker));
 		this.context = context;
-		// TODO Auto-generated constructor stub
+		
+		// Workaround for bug that Google refuses to fix:
+		// <a href="http://osdir.com/ml/AndroidDevelopers/2009-08/msg01605.html">http://osdir.com/ml/AndroidDevelopers/2009-08/msg01605.html</a>
+		// <a href="http://code.google.com/p/android/issues/detail?id=2035">http://code.google.com/p/android/issues/detail?id=2035</a>
+		populate();
+
+	}
+	
+	public MapItemizedOverlay(Drawable defaultMarker, Context context, View view) {
+		super(boundCenterBottom(defaultMarker));
+		this.context = context;
+		this.view = view;
+		
+		// Workaround for bug that Google refuses to fix:
+		// <a href="http://osdir.com/ml/AndroidDevelopers/2009-08/msg01605.html">http://osdir.com/ml/AndroidDevelopers/2009-08/msg01605.html</a>
+		// <a href="http://code.google.com/p/android/issues/detail?id=2035">http://code.google.com/p/android/issues/detail?id=2035</a>
+		populate();
+
 	}
 
 	@Override
@@ -47,6 +87,7 @@ public class MapItemizedOverlay<Item> extends ItemizedOverlay<OverlayItem> {
 	
 	public void addOverlay(OverlayItem overlay) {
 	    items.add(overlay);
+	    setLastFocusedIndex(-1);
 	    populate();
 	}
 	
@@ -54,8 +95,22 @@ public class MapItemizedOverlay<Item> extends ItemizedOverlay<OverlayItem> {
 	public boolean onTap(int index) {
 		// TODO Auto-generated method stub
 		super.onTap(index);
+		
 		OverlayItem item = items.get(index);
+		
 		GeoPoint point = item.getPoint();
+		
+		/*
+		 * Source = BestLocationFinder.getLastBestLocation()
+		 * Destination = point
+		 * Call leaflet with Source and dest
+		 * Returns an array of intermediate points.
+		 * Loop through the array {
+		 *  get intsource, intdest
+		 *  set classvariables gp1 to intsource, gp2 to intdest
+		 *  call Draw()
+		 * 
+		 */
 		this.tappedPoint = point;
 		Log.e(TAG, "Marker tapped");
 		
@@ -63,11 +118,36 @@ public class MapItemizedOverlay<Item> extends ItemizedOverlay<OverlayItem> {
 		 dialog.setCancelable(true);
 		 dialog.setPositiveButton("YES", new OkOnClickListener());
 		 dialog.setNegativeButton("NO", new CancelOnClickListener());
-		 dialog.setTitle("Do you want directions to this point");
+		 String snippet = item.getSnippet();
+		 String title = item.getTitle();
+		 dialog.setTitle(title);
+		 dialog.setMessage(snippet);
 		 dialog.show();
 		 return true;
 	}
 	
+	
+	/*
+	@Override
+	public boolean onTap(GeoPoint p, MapView mapView) {
+		// TODO Auto-generated method stub
+		super.onTap(p, mapView);
+		mapView.removeView(view);
+		TextView tv = new TextView(context);
+		tv.setBackgroundColor(R.color.white);
+		tv.setWidth(200);
+		tv.setHeight(50);
+		tv.setTextColor(R.color.black);
+		tv.setText(new String("asdsaf"));
+		MapView.LayoutParams mapParams = new MapView.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, 
+				ViewGroup.LayoutParams.WRAP_CONTENT,p,MapView.LayoutParams.BOTTOM_CENTER);
+		mapView.addView(tv,mapParams);
+		return true;
+	}
+	*/
+
+
+
 	private final class OkOnClickListener implements DialogInterface.OnClickListener {
 		public void onClick(DialogInterface dialog, int which) {
 			try{
@@ -77,8 +157,8 @@ public class MapItemizedOverlay<Item> extends ItemizedOverlay<OverlayItem> {
 					double latitude = tappedPoint.getLatitudeE6() / 1E6;
 					double longitude = tappedPoint.getLongitudeE6() / 1E6;
 
-					String sourceLoc = String.valueOf(loc.getLatitude()) + ":" + String.valueOf(loc.getLongitude());
-					String destinationLoc = String.valueOf(latitude) + ":" + String.valueOf(longitude);
+					String sourceLoc = String.valueOf(loc.getLatitude()) + "," + String.valueOf(loc.getLongitude());
+					String destinationLoc = String.valueOf(latitude) + "," + String.valueOf(longitude);
 					Intent intent = new Intent(context, WebViewActivity.class);
 					intent.putExtra("SOURCE", sourceLoc);
 					intent.putExtra("DEST", destinationLoc);
@@ -96,6 +176,13 @@ public class MapItemizedOverlay<Item> extends ItemizedOverlay<OverlayItem> {
 			
 		}
 	}
+	
+	public void clear() {
+		items.clear();
+		setLastFocusedIndex(-1);
+		populate();
+	}
+
 	
 
 }

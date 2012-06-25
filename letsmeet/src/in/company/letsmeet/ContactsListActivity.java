@@ -99,7 +99,6 @@ public class ContactsListActivity extends ListActivity {
 			SendSms sendSms = new SendSms(getApplicationContext());
 			//sendSms.sendBulkSms(tempList);
 			Intent mapIntent = new Intent(this, CommonMapActivity.class);
-			//mapIntent.putExtra("locations", obtainedLocations);
 			startActivity(mapIntent);
 			
 			

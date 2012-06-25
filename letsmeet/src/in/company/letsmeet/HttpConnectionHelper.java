@@ -33,7 +33,7 @@ public class HttpConnectionHelper {
 					response.getEntity().getContent()));
 			String line = "";
 			while ((line = rd.readLine()) != null) {
-				System.out.println(line);
+				Log.i(TAG, line);
 			}
 		}catch(Exception e) {
 			e.printStackTrace();
@@ -53,7 +53,7 @@ public class HttpConnectionHelper {
 		String line = "";
 		
 		while ((line = rd.readLine()) != null) {
-			newLine = line.concat(line);
+			newLine = newLine.concat(line);
 		}
 		
 		return newLine;

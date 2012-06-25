@@ -28,7 +28,12 @@ public class Main extends Activity {
 		setContentView(R.layout.main);
 		finder = new BestLocationFinder(getApplicationContext());
 		location = finder.getLastBestLocation(System.currentTimeMillis());
-		Log.i(TAG, "Location update" + location.getLatitude() + location.getLongitude());
+		if (location != null) {
+			Log.i(TAG, "Location update" + location.getLatitude() + location.getLongitude());
+		} else {
+			Log.i(TAG, "Location is null");
+			this.finish();
+		}
 	}
 	
 	public void openLetsMeet(View view) {
