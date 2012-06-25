@@ -3,7 +3,7 @@ var url = require("url");
 var sys = require('sys');
 var fs = require('fs');
 var temp = '';
-var meAndMyFriends = {};
+var meAndMyFriends = [];
 function onRequest(request,response) {
   var postData = '';
   var pathName = url.parse(request.url).pathname;
@@ -24,24 +24,21 @@ function onRequest(request,response) {
         response.end();
       });
     } else if(request.method =='GET') {
-				sys.debug("in get");
+	sys.debug("in get");
         var pathName = url.parse(request.url).pathname;
-	sys.debug("Get PathName" + pathName + ":" + request.url);
-	var myLoc = meAndMyFriends.MYLOCATION;
-	sys.debug("My Location" + myLoc);
-	var locations = meAndMyFriends.FRIENDS;
-	sys.debug("LOCATIONS: " + locations.length);
-	var baseUrl = 'http://ec2-122-248-211-48.ap-southeast-1.compute.amazonaws.com:8080/letsmeet.html?locations=' + myLoc;
-	for(var iLoc = 0;iLoc < locations.length; ++iLoc) {
-		var loc = locations[iLoc].LOC;
-		sys.debug("LOC::: " + loc);
-		baseUrl = baseUrl + ":" + loc;
-	}
-	sys.debug("PATH:::" + baseUrl);
-       	response.writeHead(200,{"Content-type":"application/json"});
-	response.write(JSON.stringify(meAndMyFriends));
-       	response.end();
-	}
+	var id = pathName.split("=");
+	var userId = id[1];
+	for (var fIndex = 0;fIndex < meAndMyFriends.length;++fIndex) {
+		var organizer = meAndMyFriends[fIndex];
+		console.log("IN Get" + userId);
+		console.log(JSON.stringify(organizer));
+		if(organizer.MYID === userId) {
+       			response.writeHead(200,{"Content-type":"application/json"});
+			response.write(JSON.stringify(organizer));
+       			response.end();
+		}
+    	}
+}
 		
 }
 
@@ -59,19 +56,22 @@ function storeAndroidUserData(postData,pathName) {
   var dataArray = data.FRIENDS;
   sys.debug("data array is" + dataArray);
   if(dataArray !== undefined) {
-	sys.debug("Post sent from originator");
-  	meAndMyFriends = data;
-	sys.debug(meAndMyFriends.MYID);
+	sys.debug("Post sent from organizer");
+  	var organizer = data;
+	meAndMyFriends.push(data);
+	sys.debug(JSON.stringify(meAndMyFriends));
   } else {
 	sys.debug("Data coming from friends");
 	var id = data.id;
 	var loc = data.loc;
-		var values = meAndMyFriends.FRIENDS;
+		for(var mIn = 0;mIn < meAndMyFriends.length; ++mIn) {
+		var values = meAndMyFriends[mIn].FRIENDS;
 		for(var i=0;i<values.length;++i) {
 			if(values[i].PHONE_NUMBER === id) {
 				sys.debug("Friends location found");
 				values[i].LOC = loc;	
 			}
+		}	
 		}
 		sys.debug(meAndMyFriends.FRIENDS);
 	}
