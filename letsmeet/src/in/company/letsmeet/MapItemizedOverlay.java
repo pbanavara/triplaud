@@ -13,14 +13,11 @@ import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.ItemizedOverlay;
 import com.google.android.maps.MapView;
 import com.google.android.maps.OverlayItem;
-import com.google.android.maps.MapView.LayoutParams;
 
 /**
  * @author pradeep
@@ -35,8 +32,6 @@ public class MapItemizedOverlay<Item> extends ItemizedOverlay<OverlayItem> {
 	private ArrayList<OverlayItem> items = new ArrayList<OverlayItem>();
 	private Context context;
 	private GeoPoint tappedPoint;
-	private Drawable fsMarker;
-	private View view;
 	
 	public MapItemizedOverlay(Drawable defaultMarker) {
 		super(boundCenterBottom(defaultMarker));
@@ -64,8 +59,6 @@ public class MapItemizedOverlay<Item> extends ItemizedOverlay<OverlayItem> {
 	public MapItemizedOverlay(Drawable defaultMarker, Context context, View view) {
 		super(boundCenterBottom(defaultMarker));
 		this.context = context;
-		this.view = view;
-		
 		// Workaround for bug that Google refuses to fix:
 		// <a href="http://osdir.com/ml/AndroidDevelopers/2009-08/msg01605.html">http://osdir.com/ml/AndroidDevelopers/2009-08/msg01605.html</a>
 		// <a href="http://code.google.com/p/android/issues/detail?id=2035">http://code.google.com/p/android/issues/detail?id=2035</a>
@@ -101,6 +94,7 @@ public class MapItemizedOverlay<Item> extends ItemizedOverlay<OverlayItem> {
 		GeoPoint point = item.getPoint();
 		
 		/*
+		 * Directions Logic
 		 * Source = BestLocationFinder.getLastBestLocation()
 		 * Destination = point
 		 * Call leaflet with Source and dest
@@ -109,6 +103,12 @@ public class MapItemizedOverlay<Item> extends ItemizedOverlay<OverlayItem> {
 		 *  get intsource, intdest
 		 *  set classvariables gp1 to intsource, gp2 to intdest
 		 *  call Draw()
+		 * 
+		 */
+		
+		/*
+		 * Tap selection transmission
+		 * Move foursquare to the backend.
 		 * 
 		 */
 		this.tappedPoint = point;
@@ -126,28 +126,6 @@ public class MapItemizedOverlay<Item> extends ItemizedOverlay<OverlayItem> {
 		 return true;
 	}
 	
-	
-	/*
-	@Override
-	public boolean onTap(GeoPoint p, MapView mapView) {
-		// TODO Auto-generated method stub
-		super.onTap(p, mapView);
-		mapView.removeView(view);
-		TextView tv = new TextView(context);
-		tv.setBackgroundColor(R.color.white);
-		tv.setWidth(200);
-		tv.setHeight(50);
-		tv.setTextColor(R.color.black);
-		tv.setText(new String("asdsaf"));
-		MapView.LayoutParams mapParams = new MapView.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, 
-				ViewGroup.LayoutParams.WRAP_CONTENT,p,MapView.LayoutParams.BOTTOM_CENTER);
-		mapView.addView(tv,mapParams);
-		return true;
-	}
-	*/
-
-
-
 	private final class OkOnClickListener implements DialogInterface.OnClickListener {
 		public void onClick(DialogInterface dialog, int which) {
 			try{

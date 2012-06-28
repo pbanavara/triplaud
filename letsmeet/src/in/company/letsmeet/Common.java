@@ -1,24 +1,23 @@
 package in.company.letsmeet;
 
-import java.util.Random;
-
 import android.content.Context;
+import android.location.Location;
 import android.location.LocationManager;
 
 public final class Common {
  public static final String URL = "http://ec2-122-248-211-48.ap-southeast-1.compute.amazonaws.com:8888";
- public static final String MY_ID = String.valueOf(new Random().nextInt());
- private static String currentLocation ;
+ public static String MY_ID;
+ private static Location currentLocation ;
  public static LocationManager locationManager;
  public static Context context;
  public static final String DIRECTIONS_URL = "http://maps.googleapis.com/maps/api/directions/json?";
  public static final String FOURSQUARE_URL = "https://api.foursquare.com/v2/venues/explore?client_id=N3RMDIQFPLHPLTJMRKLNV4ULXJCXWOPY3HZ2EOMXBSJWU1SW&client_secret=EQKC52S2W5RP1N2CQYQ2CPM1H55PISXUE41UIG55LEJQSDTY&section=coffee&oauth_token=4ENF4MW3PJMMUPS5D5FJC1OP5WXRVF2FFAZCMFG1PDSLBRAH&v=20120516&limit=4&intent=browse&radius=2000&ll=";
  
- public static void setLocation(String location) {
+ public static void setLocation(Location location) {
 	 currentLocation = location;
  }
  
- public static String getLocation() {
+ public static Location getLocation() {
 	 return currentLocation;
  }
  

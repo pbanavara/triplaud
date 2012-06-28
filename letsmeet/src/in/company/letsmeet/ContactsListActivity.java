@@ -3,21 +3,15 @@ package in.company.letsmeet;
 import in.company.letsmeet.locationutil.BestLocationFinder;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-
-import com.google.android.maps.GeoPoint;
-import com.google.android.maps.MapView;
-import com.google.android.maps.OverlayItem;
 
 import android.app.ListActivity;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.Cursor;
 import android.location.Location;
-import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
@@ -89,15 +83,17 @@ public class ContactsListActivity extends ListActivity {
 			//finalObject.put("MYLOCATION", getGpsData(getApplicationContext()));
 			finder = new BestLocationFinder(getApplicationContext());
 			Location location = finder.getLastBestLocation(System.currentTimeMillis());
+			//Location location = Common.getLocation();
 			String newLoc = location.getLatitude() + "," + location.getLongitude();
 			finalObject.put("MYLOCATION", newLoc);
 			finalObject.put("FRIENDS", selectedContacts);
 			Log.i("ContactsList", String.valueOf(selectedContacts.length()));
 			connectionHelper = new HttpConnectionHelper();
-			connectionHelper.postData(Common.URL, finalObject);
+			connectionHelper.postData(Common.URL + "/id=" + Common.MY_ID, finalObject);
 			
 			SendSms sendSms = new SendSms(getApplicationContext());
-			//sendSms.sendBulkSms(tempList);
+			sendSms.sendBulkSms(tempList);
+			Log.i(TAG, "SMS Sent");
 			Intent mapIntent = new Intent(this, CommonMapActivity.class);
 			startActivity(mapIntent);
 			

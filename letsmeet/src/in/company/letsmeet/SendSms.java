@@ -6,19 +6,11 @@ package in.company.letsmeet;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import android.app.Activity;
 import android.app.PendingIntent;
-import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
-import android.os.IBinder;
 import android.telephony.SmsManager;
 import android.util.Log;
-import android.view.View;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
-import android.widget.Button;
 
 /**
  * @author pradeep
@@ -27,7 +19,7 @@ import android.widget.Button;
  */
 public class SendSms {
 	private static final String message = "meet-me:";
-	private WebView wv;
+	
 	private Context context;
 	
 	public SendSms(Context context) {

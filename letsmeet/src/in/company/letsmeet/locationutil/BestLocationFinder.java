@@ -22,7 +22,7 @@ public class BestLocationFinder {
 	  public BestLocationFinder(Context context) {
 		  locationManager = (LocationManager)context.getSystemService(Context.LOCATION_SERVICE);
 		  criteria = new Criteria();
-		  criteria.setAccuracy(Criteria.ACCURACY_COARSE);
+		  criteria.setPowerRequirement(Criteria.POWER_MEDIUM);
 		  this.context = context;
 	  }
 	  

@@ -4,21 +4,13 @@ import in.company.letsmeet.locationutil.BestLocationFinder;
 
 import org.json.JSONObject;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
-import android.view.View;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
-import android.widget.Button;
 
 
 public class ShowDialog extends CommonMapActivity {
@@ -27,8 +19,7 @@ public class ShowDialog extends CommonMapActivity {
 	private String sender;
 	private String myNumber;
 	private HttpConnectionHelper connectionHelper;
-	private LocationListener listener;
-	private WebView wv;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 	
@@ -84,21 +75,6 @@ public class ShowDialog extends CommonMapActivity {
 		}
 	}
 	
-	/**
-	 * Fires off the GPS listener for gathering location updates.
-	 */
-	public void startLocationUpdates() {
-		try{
-			Common.locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-			listener = new LocListener();
-			if(Common.locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-				Common.locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, listener);
-			} else if(Common.locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
-				Common.locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, listener);
-			}
-		}catch(Exception e) {
-			e.printStackTrace();
-		}
-	}
+	
 }
 

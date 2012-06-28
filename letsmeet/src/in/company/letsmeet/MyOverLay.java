@@ -1,23 +1,15 @@
 package in.company.letsmeet;
 
-import com.google.android.maps.Overlay;
-import com.google.android.maps.GeoPoint;
-import com.google.android.maps.MapActivity;
-import com.google.android.maps.MapController;
-import com.google.android.maps.MapView;
-import com.google.android.maps.MapView.LayoutParams;
- 
-import android.os.Bundle;
-import android.view.View;
-import android.widget.LinearLayout;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.content.Context;
 import android.graphics.Canvas;
-import com.google.android.maps.Projection;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
-import android.graphics.Color;
+
+import com.google.android.maps.GeoPoint;
+import com.google.android.maps.MapView;
+import com.google.android.maps.Overlay;
+import com.google.android.maps.Projection;
 
 
 public class MyOverLay extends Overlay { 
@@ -26,8 +18,7 @@ public class MyOverLay extends Overlay {
     //private int mRadius=6; 
     private int mode=0; 
     private int defaultColor; 
-    private String text=""; 
-    private Bitmap img = null; 
+    
     Context mContext;
 
     public MyOverLay(Context context,GeoPoint gp1,GeoPoint gp2,int mode) // GeoPoint is a int. (6E) 
@@ -47,14 +38,7 @@ public class MyOverLay extends Overlay {
         this.mode = mode; 
         this.defaultColor = defaultColor; 
     } 
-    public void setText(String t) 
-    { 
-        this.text = t; 
-    } 
-    public void setBitmap(Bitmap bitmap) 
-    { 
-        this.img = bitmap; 
-    } 
+   
     public int getMode() 
     { 
         return mode; 
