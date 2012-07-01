@@ -2,11 +2,12 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content" >
+ <!--  
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content" >
-
  </LinearLayout>
+-->
 
  <Button
      android:id="@+id/button1"
@@ -19,8 +20,8 @@
 
  <ListView
      android:id="@android:id/list"
-     android:layout_width="400dp"
-     android:layout_height="500dp"
+     android:layout_width="wrap_content"
+     android:layout_height="200dp"
      android:layout_alignParentLeft="true"
      android:layout_alignParentTop="true" >
  </ListView>

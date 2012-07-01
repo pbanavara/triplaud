@@ -6,7 +6,7 @@ import java.io.InputStreamReader;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
+import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HTTP;
@@ -24,8 +24,9 @@ public class HttpConnectionHelper {
 	public void postData(String url, JSONObject object) {
 		try {
 			HttpClient client = new DefaultHttpClient();
-			HttpPost post = new HttpPost(url);	
-			StringEntity jsonData = new StringEntity(object.toString(1));
+			HttpPost post = new HttpPost(url);
+			
+			ByteArrayEntity jsonData = new ByteArrayEntity(object.toString().getBytes("UTF8"));
 			jsonData.setContentEncoding(new BasicHeader(HTTP.CONTENT_TYPE,"application/json"));
 			post.setEntity(jsonData);	
 			org.apache.http.HttpResponse response = client.execute(post);

@@ -1,5 +1,7 @@
 package in.company.letsmeet.locationutil;
 
+import in.company.letsmeet.Common;
+
 import java.util.List;
 
 import android.content.Context;
@@ -18,56 +20,42 @@ public class BestLocationFinder {
 	  protected LocationManager locationManager;
 	  protected Criteria criteria;
 	  protected Context context;
+	  public Location bestResult;
 	  
 	  public BestLocationFinder(Context context) {
 		  locationManager = (LocationManager)context.getSystemService(Context.LOCATION_SERVICE);
 		  criteria = new Criteria();
-		  criteria.setPowerRequirement(Criteria.POWER_MEDIUM);
+		  criteria.setPowerRequirement(Criteria.POWER_LOW);
+		  criteria.setAccuracy(Criteria.ACCURACY_COARSE);
 		  this.context = context;
 	  }
 	  
-	  public Location getLastBestLocation(long minTime) {
-		    Location bestResult = null;
-		    float bestAccuracy = Float.MAX_VALUE;
-		    long bestTime = Long.MAX_VALUE;
-		    
-		    // Iterate through all the providers on the system, keeping
-		    // note of the most accurate result within the acceptable time limit.
-		    // If no result is found within maxTime, return the newest Location.
-		    List<String> matchingProviders = locationManager.getAllProviders();
-		    for (String provider: matchingProviders) {
-		      Location location = locationManager.getLastKnownLocation(provider);
+	  public void getBestLocation(long minTime) {
+		  String provider = (locationManager.getProvider(LocationManager.NETWORK_PROVIDER)).getName();
+		     Location location = locationManager.getLastKnownLocation(provider);
 		      if (location != null) {
-		        float accuracy = location.getAccuracy();
+		       
 		        long time = location.getTime();
-		        
-		        if ((time < minTime && accuracy < bestAccuracy)) {
-		          bestResult = location;
-		          bestAccuracy = accuracy;
-		          bestTime = time;
+		        if (time < minTime) {		          
+		          locationManager.requestLocationUpdates(provider, 0, 0, singeUpdateListener, context.getMainLooper());
 		          Log.i(TAG, "Old update");
 		        }
-		        else if (time > minTime && bestAccuracy == Float.MAX_VALUE && time < bestTime) {
-		          bestResult = location;
-		          bestTime = time;
+		        else if (time >= minTime) {
+		          Common.setLocation(location);
 		        }
-		      }
-		    }
-		    if (locationListener != null && (bestTime > minTime)) { 
-		        String provider = locationManager.getBestProvider(criteria, true);
-		        if (provider != null)
-		          locationManager.requestLocationUpdates(provider, 0, 0, singeUpdateListener, context.getMainLooper());
-		      }
+		      } 
 		      
-		      return bestResult;
+	  }
+	  
+	  public Location getBestResult() {
+		  return this.bestResult;
 	  }
 
 	protected LocationListener singeUpdateListener = new LocationListener() {
 	    public void onLocationChanged(Location location) {
-	      Log.d(TAG, "Single Location Update Received: " + location.getLatitude() + "," + location.getLongitude());
-	      if (locationListener != null && location != null)
-	        locationListener.onLocationChanged(location);
-	      locationManager.removeUpdates(singeUpdateListener);
+	      Log.d(TAG, "Location Update Received: " + location.getLatitude() + "," + location.getLongitude());
+	      Common.setLocation(location);
+	      locationManager.removeUpdates(this);
 	    }
 	    
 	    public void onProviderEnabled(String provider) {}    

@@ -17,12 +17,13 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
-import android.view.View;
+import android.widget.Toast;
 
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapActivity;
 import com.google.android.maps.MapController;
 import com.google.android.maps.MapView;
+import com.google.android.maps.MyLocationOverlay;
 import com.google.android.maps.Overlay;
 import com.google.android.maps.OverlayItem;
 
@@ -33,6 +34,8 @@ public class CommonMapActivity extends MapActivity{
 	private List<Overlay> mapOverlays;
 	private Timer timer;
 	private TimerTask doAsynchronousTask;
+	private MyLocationOverlay myOverlay;
+	private int arraySize;
 
 	private HttpConnectionHelper connectionHelper = new HttpConnectionHelper();
 
@@ -57,32 +60,28 @@ public class CommonMapActivity extends MapActivity{
 	protected void onCreate(Bundle bundle) {
 		// TODO Auto-generated method stub
 		super.onCreate(bundle);
-		drawable = this.getResources().getDrawable(R.drawable.purpleicon);
+		BestLocationFinder finder = new BestLocationFinder(getApplicationContext());
+		finder.getBestLocation(System.currentTimeMillis());
+		drawable = this.getResources().getDrawable(R.drawable.marker);
 		fsDrawable = getApplicationContext().getResources().getDrawable(R.drawable.orangeicon);
 		setContentView(R.layout.mapus);
 		MapView mapView = (MapView) findViewById(R.id.mapview);
 		mapView.invalidate();
-		View popUp = getLayoutInflater().inflate(R.layout.popup,mapView,false);
-		itemizedOverlay = new MapItemizedOverlay<Object>(drawable, this, popUp);
+		itemizedOverlay = new MapItemizedOverlay<Object>(drawable, this, mapView);
 		mapOverlays = mapView.getOverlays();
-		mapView.buildDrawingCache(true);
 		MapController mapControl = mapView.getController();
-		mapControl.setZoom(14);
-
-		BestLocationFinder finder = new BestLocationFinder(getApplicationContext());
-		Location loc = finder.getLastBestLocation(System.currentTimeMillis());
+		mapControl.setZoom(15);
+		MyLocationOverlay myOverlay = new MyLocationOverlay(this, mapView);
+		myOverlay.enableMyLocation();
+		myOverlay.enableCompass();
+		mapOverlays.add(myOverlay);
+		Location loc = Common.getLocation();
+		
 		GeoPoint point = new GeoPoint((int) (loc.getLatitude() * 1000000),(int) (loc.getLongitude() * 1000000));
-		mapControl.setCenter(point);
-		mapControl.animateTo(point);
+		Toast.makeText(this, "Your current location is shown, please wait for your friend's locations", Toast.LENGTH_LONG);
 		Log.i("map ctivity", String.valueOf(point.getLatitudeE6()) + String.valueOf(point.getLongitudeE6()));
-		mapView.setBuiltInZoomControls(true);     
+		mapView.setBuiltInZoomControls(true);    
 		toCallAsynchronous(mapView);
-		AddMapOverlays asyncTask = new AddMapOverlays();
-		try {
-			asyncTask.execute(mapView);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 
 	}
 
@@ -113,8 +112,8 @@ public class CommonMapActivity extends MapActivity{
 			}
 
 		};
-		timer.schedule(doAsynchronousTask,0,5000);
-
+		// Find out an optimized timer frequency.
+		timer.schedule(doAsynchronousTask,0,10000);
 	}
 
 	@Override
@@ -150,6 +149,7 @@ public class CommonMapActivity extends MapActivity{
 	 */
 	private class AddMapOverlays extends AsyncTask<MapView, Void, List<OverlayItem>>{
 		private static final String TAG = "AddMapOverlaysAsync";
+		private boolean isPointSelected = false;
 		/**
 		 * @param mapView
 		 * @return List of Overlayitems containing the locations for the organizer, friends and meeting locations.
@@ -161,12 +161,14 @@ public class CommonMapActivity extends MapActivity{
 				String obtainedLocations = connectionHelper.getData(url);
 				Log.i(TAG, "Locations obtained from backend" + obtainedLocations);
 				JSONObject object = new JSONObject(obtainedLocations);
+				
 				//Organizer location
 				String[] organizerLocation = ((String)object.get("MYLOCATION")).split(",");
 				GeoPoint oPoint = new GeoPoint( (int)(Double.parseDouble(organizerLocation[0]) * 1000000) , (int)(Double.parseDouble(organizerLocation[1]) * 1000000));
 				OverlayItem oItem = new OverlayItem(oPoint, "Organizer location","Do you need directions to this point");
 				oItem.setMarker(drawable);
 				pointList.add(oItem);
+				
 
 				//Friends locations
 				JSONArray array = object.getJSONArray("FRIENDS");
@@ -192,12 +194,26 @@ public class CommonMapActivity extends MapActivity{
 				if(fsArray != null) {
 					for(int i=0;i<fsArray.length();++i) {
 						JSONObject obj = (JSONObject) fsArray.get(i);
+						String id = obj.getString("id");
 						String lat = obj.getString("lat");
 						String lng = obj.getString("lng");
+						String name = obj.getString("name");
+						String address = obj.getString("address");
+						String selected = obj.getString("selected");
+						if (selected.equalsIgnoreCase("maybe")) {
+							fsDrawable = getApplicationContext().getResources().getDrawable(R.drawable.purpleicon); 
+							
+						} else if(selected.equalsIgnoreCase("yes")) {
+							fsDrawable = getApplicationContext().getResources().getDrawable(R.drawable.greenicon);
+							
+						} else {
+							fsDrawable = getApplicationContext().getResources().getDrawable(R.drawable.orangeicon);
+						}
+						String organizer = object.getString("MYID");
 						Double tempLat = Double.parseDouble(lat);
 						Double tempLon = Double.parseDouble(lng);
 						GeoPoint fsPoint = new GeoPoint((int)(tempLat * 1000000) , (int)(tempLon * 1000000));
-						OverlayItem fsItem = new OverlayItem(fsPoint, "Meeting Location", "Do you need directions to this point");
+						OverlayItem fsItem = new OverlayItem(fsPoint, name + ":" + address, organizer + ":" + id);
 						fsDrawable.setBounds(0, 0, fsDrawable.getIntrinsicWidth(),fsDrawable.getIntrinsicHeight());
 						fsItem.setMarker(fsDrawable);
 						pointList.add(fsItem);	
@@ -234,16 +250,28 @@ public class CommonMapActivity extends MapActivity{
 		@Override
 		protected void onPostExecute(List<OverlayItem> result) {
 			try {
-				// TODO Auto-generated method stub
-				mapOverlays.clear();
-				itemizedOverlay.clear();
-				Iterator<OverlayItem> iterator = result.iterator();
-				while(iterator.hasNext()) {					
-					OverlayItem item = iterator.next();			
-					itemizedOverlay.addOverlay(item);
+				
+				// The arraySize is added as an optimizer to restrict map updates
+				// TODO Auto-generated method stub			
+				if (arraySize == 0) {
+					arraySize = result.size();
+					Iterator<OverlayItem> iterator = result.iterator();		
+					while(iterator.hasNext()) {					
+						OverlayItem item = iterator.next();			
+						itemizedOverlay.addOverlay(item);
+					}
+					mapOverlays.add(itemizedOverlay);
+				} else if (arraySize != result.size()) {
+					mapOverlays.clear();
+					itemizedOverlay.clear();
+					Iterator<OverlayItem> iterator = result.iterator();		
+					while(iterator.hasNext()) {					
+						OverlayItem item = iterator.next();			
+						itemizedOverlay.addOverlay(item);
+					}
+					arraySize = result.size();
+					mapOverlays.add(itemizedOverlay);
 				}
-				mapOverlays.add(itemizedOverlay);
-
 
 			} catch(Exception e) {
 				e.printStackTrace();

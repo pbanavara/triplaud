@@ -4,10 +4,14 @@ import android.content.Context;
 import android.location.Location;
 import android.location.LocationManager;
 
+/**
+ * @author pradeep
+ * Common class for all the required constants.
+ */
 public final class Common {
  public static final String URL = "http://ec2-122-248-211-48.ap-southeast-1.compute.amazonaws.com:8888";
  public static String MY_ID;
- private static Location currentLocation ;
+ private static Location currentLocation;
  public static LocationManager locationManager;
  public static Context context;
  public static final String DIRECTIONS_URL = "http://maps.googleapis.com/maps/api/directions/json?";

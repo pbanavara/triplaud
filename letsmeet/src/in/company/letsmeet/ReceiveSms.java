@@ -20,6 +20,7 @@ public class ReceiveSms extends BroadcastReceiver {
 		System.out.println("In the SMS Receive body");
 		Object[] messages = (Object[])bundle.get("pdus");
 		SmsMessage[] sms = new SmsMessage[messages.length];
+		
 		for(int i=0;i<messages.length;++i){
 			sms[i] = SmsMessage.createFromPdu((byte[])messages[i]);
 		}

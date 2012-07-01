@@ -27,10 +27,14 @@ public class ContactsListActivity extends ListActivity {
 	private static final String TAG = "ContactsListActivity";
 	private ArrayList<Contacts> values;
 	private HttpConnectionHelper connectionHelper;
+	BestLocationFinder finder;
+	private Location location ;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		finder = new BestLocationFinder(getApplicationContext());
+		finder.getBestLocation(System.currentTimeMillis());
 		Cursor mCursor = getContacts();
 		startManagingCursor(mCursor);
 		values = new ArrayList<Contacts>();
@@ -59,7 +63,6 @@ public class ContactsListActivity extends ListActivity {
 	 * send to a HttpServer. Also send SMS messages to the selected contacts.
 	 */
 	public void sendSelectedContacts(View view) {
-		BestLocationFinder finder;
 		try {
 		ArrayList<String> tempList = new ArrayList<String>();
 			JSONArray selectedContacts = new JSONArray();
@@ -80,10 +83,10 @@ public class ContactsListActivity extends ListActivity {
 			}	
 			JSONObject finalObject = new JSONObject();
 			finalObject.put("MYID", Common.MY_ID);
-			//finalObject.put("MYLOCATION", getGpsData(getApplicationContext()));
-			finder = new BestLocationFinder(getApplicationContext());
-			Location location = finder.getLastBestLocation(System.currentTimeMillis());
-			//Location location = Common.getLocation();
+			while(Common.getLocation() == null) {
+				Thread.sleep(100);
+			}
+			Location location = Common.getLocation();
 			String newLoc = location.getLatitude() + "," + location.getLongitude();
 			finalObject.put("MYLOCATION", newLoc);
 			finalObject.put("FRIENDS", selectedContacts);

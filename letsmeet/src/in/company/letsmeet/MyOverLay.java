@@ -39,7 +39,10 @@ public class MyOverLay extends Overlay {
         this.defaultColor = defaultColor; 
     } 
    
-    public int getMode() 
+    public MyOverLay() {
+		// TODO Auto-generated constructor stub
+	}
+	public int getMode() 
     { 
         return mode; 
     } 

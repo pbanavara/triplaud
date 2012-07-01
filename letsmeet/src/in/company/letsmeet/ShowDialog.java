@@ -4,6 +4,7 @@ import in.company.letsmeet.locationutil.BestLocationFinder;
 
 import org.json.JSONObject;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.app.Dialog;
@@ -13,9 +14,8 @@ import android.location.Location;
 import android.os.Bundle;
 
 
-public class ShowDialog extends CommonMapActivity {
+public class ShowDialog extends Activity{
 	private static final int DIALOG_ALERT = 10;
-
 	private String sender;
 	private String myNumber;
 	private HttpConnectionHelper connectionHelper;
@@ -52,7 +52,12 @@ public class ShowDialog extends CommonMapActivity {
 			try{
 				//Push the current location to the back-end server as a JSON object.
 					BestLocationFinder finder = new BestLocationFinder(getApplicationContext());
-					Location loc = finder.getLastBestLocation(System.currentTimeMillis());
+					finder.getBestLocation(System.currentTimeMillis());
+					Location loc = Common.getLocation();
+					while (loc == null) {
+						Thread.sleep(100);
+						loc = Common.getLocation();
+					}
 					String locString = String.valueOf(loc.getLatitude()) + "," + String.valueOf(loc.getLongitude());
 					connectionHelper = new HttpConnectionHelper();
 					JSONObject obj = new JSONObject();
