@@ -12,6 +12,7 @@ import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HTTP;
 import org.json.JSONObject;
 
+import android.os.Handler;
 import android.util.Log;
 
 /**
@@ -21,21 +22,30 @@ import android.util.Log;
 public class HttpConnectionHelper {
 	private static final String TAG = "HttpConnectionHelper";
 	
-	public void postData(String url, JSONObject object) {
+	public void postData(final String url, final JSONObject object) {
 		try {
-			HttpClient client = new DefaultHttpClient();
-			HttpPost post = new HttpPost(url);
+			new Thread( new Runnable() {
+				public void run() {
+					try {
+					HttpClient client = new DefaultHttpClient();
+					HttpPost post = new HttpPost(url);
+					
+					ByteArrayEntity jsonData = new ByteArrayEntity(object.toString().getBytes("UTF8"));
+					jsonData.setContentEncoding(new BasicHeader(HTTP.CONTENT_TYPE,"application/json"));
+					post.setEntity(jsonData);	
+					org.apache.http.HttpResponse response = client.execute(post);
+					BufferedReader rd = new BufferedReader(new InputStreamReader(
+							response.getEntity().getContent()));
+					String line = "";
+					while ((line = rd.readLine()) != null) {
+						Log.i(TAG, line);
+					}
+					} catch(Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}).start();
 			
-			ByteArrayEntity jsonData = new ByteArrayEntity(object.toString().getBytes("UTF8"));
-			jsonData.setContentEncoding(new BasicHeader(HTTP.CONTENT_TYPE,"application/json"));
-			post.setEntity(jsonData);	
-			org.apache.http.HttpResponse response = client.execute(post);
-			BufferedReader rd = new BufferedReader(new InputStreamReader(
-					response.getEntity().getContent()));
-			String line = "";
-			while ((line = rd.readLine()) != null) {
-				Log.i(TAG, line);
-			}
 		}catch(Exception e) {
 			e.printStackTrace();
 		}

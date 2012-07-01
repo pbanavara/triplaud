@@ -35,6 +35,7 @@ public class CommonMapActivity extends MapActivity{
 	private Timer timer;
 	private TimerTask doAsynchronousTask;
 	private MyLocationOverlay myOverlay;
+	private MapController mapControl;
 	private int arraySize;
 
 	private HttpConnectionHelper connectionHelper = new HttpConnectionHelper();
@@ -69,7 +70,7 @@ public class CommonMapActivity extends MapActivity{
 		mapView.invalidate();
 		itemizedOverlay = new MapItemizedOverlay<Object>(drawable, this, mapView);
 		mapOverlays = mapView.getOverlays();
-		MapController mapControl = mapView.getController();
+		mapControl = mapView.getController();
 		mapControl.setZoom(15);
 		MyLocationOverlay myOverlay = new MyLocationOverlay(this, mapView);
 		myOverlay.enableMyLocation();
@@ -82,6 +83,7 @@ public class CommonMapActivity extends MapActivity{
 		Log.i("map ctivity", String.valueOf(point.getLatitudeE6()) + String.valueOf(point.getLongitudeE6()));
 		mapView.setBuiltInZoomControls(true);    
 		toCallAsynchronous(mapView);
+		Toast.makeText(getApplicationContext(), "Please wait while we retrieve locations",Toast.LENGTH_LONG).show();
 
 	}
 
@@ -253,25 +255,15 @@ public class CommonMapActivity extends MapActivity{
 				
 				// The arraySize is added as an optimizer to restrict map updates
 				// TODO Auto-generated method stub			
-				if (arraySize == 0) {
-					arraySize = result.size();
-					Iterator<OverlayItem> iterator = result.iterator();		
-					while(iterator.hasNext()) {					
-						OverlayItem item = iterator.next();			
-						itemizedOverlay.addOverlay(item);
-					}
-					mapOverlays.add(itemizedOverlay);
-				} else if (arraySize != result.size()) {
-					mapOverlays.clear();
+					//mapOverlays.clear();
 					itemizedOverlay.clear();
 					Iterator<OverlayItem> iterator = result.iterator();		
 					while(iterator.hasNext()) {					
 						OverlayItem item = iterator.next();			
 						itemizedOverlay.addOverlay(item);
 					}
-					arraySize = result.size();
+					
 					mapOverlays.add(itemizedOverlay);
-				}
 
 			} catch(Exception e) {
 				e.printStackTrace();

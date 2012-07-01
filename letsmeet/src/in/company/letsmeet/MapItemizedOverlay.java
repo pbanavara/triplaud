@@ -13,6 +13,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 
@@ -91,6 +92,7 @@ public class MapItemizedOverlay<Item> extends ItemizedOverlay<OverlayItem> {
 	@Override
 	public boolean onTap(int index) {
 		super.onTap(index);
+		
 		// TODO Auto-generated method stub
 		OverlayItem item = items.get(index);
 		GeoPoint point = item.getPoint();
@@ -100,7 +102,7 @@ public class MapItemizedOverlay<Item> extends ItemizedOverlay<OverlayItem> {
 		markerId  = organizerArr[1];
 		this.tappedPoint = point;
 		Log.e(TAG, "Marker tapped");
-		try {
+			
 			AlertDialog.Builder dialog = new AlertDialog.Builder(context);
 			dialog.setCancelable(true);
 			title = item.getTitle();
@@ -109,30 +111,21 @@ public class MapItemizedOverlay<Item> extends ItemizedOverlay<OverlayItem> {
 			dialog.setPositiveButton("YES", new DialogInterface.OnClickListener(){
 				public void onClick(DialogInterface dialog, int id) {
 					try{
-						Log.e(TAG, "Location Finalized");
-						helper = new HttpConnectionHelper();
-						JSONObject obj = new JSONObject();
-						try {
-							String value = new String("yes");
-							obj.put("selected",value);
-
-						} catch (JSONException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-						helper.postData(Common.URL + "/id=" + markerId + "&organizer=" + organizer, obj);
-						//Push the current location to the back-end server as a JSON object.	
 						Location location = Common.getLocation();
 						if(location == null) {
 							BestLocationFinder finder = new BestLocationFinder(context);
 							finder.getBestLocation(System.currentTimeMillis());
 						}
+
 						String sourceLoc = String.valueOf(location.getLatitude()) + "," + String.valueOf(location.getLongitude());
 						String destLoc = String.valueOf(tappedPoint.getLatitudeE6() / 1E6) + "," + String.valueOf(tappedPoint.getLongitudeE6() / 1E6);	
 						Intent intent = new Intent(context,WebViewActivity.class);
 						intent.putExtra("SOURCE", sourceLoc);
 						intent.putExtra("DEST", destLoc);
 						context.startActivity(intent);
+						Log.e(TAG, "Location Finalized");
+						postMarkerData("yes");
+						
 
 					} catch(Exception e){
 						e.printStackTrace();
@@ -141,31 +134,11 @@ public class MapItemizedOverlay<Item> extends ItemizedOverlay<OverlayItem> {
 			});
 			dialog.setNegativeButton("NO, I'll try another", new DialogInterface.OnClickListener(){
 				public void onClick(DialogInterface dialog, int id) {
-					
+
 				}
 			});
 			dialog.show();
-			
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-		// This was causing the delay in the dialog showing up. Hence had to run it in a separte thread.
-		new Runnable() {
-			public void run() {
-		helper = new HttpConnectionHelper();
-		JSONObject obj = new JSONObject();
-		try {
-			String value = new String("maybe");
-			obj.put("selected",value);
-
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		helper.postData(Common.URL + "/id=" + markerId + "&organizer=" + organizer, obj);
-			}
-		};
+			postMarkerData("maybe");
 		return true;
 	}
 
@@ -173,6 +146,20 @@ public class MapItemizedOverlay<Item> extends ItemizedOverlay<OverlayItem> {
 		items.clear();
 		setLastFocusedIndex(-1);
 		populate();
+	}
+
+	public void postMarkerData(String selected) {
+		try {
+			helper = new HttpConnectionHelper();
+			JSONObject obj = new JSONObject();
+			obj.put("selected",selected);
+			helper.postData(Common.URL + "/id=" + markerId + "&organizer=" + organizer, obj);
+			Log.i("Inside MapItemized Handler onTap" , "data sent");
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 	}
 
 }
