@@ -22,17 +22,19 @@ public final class R {
         public static final int purpleicon=0x7f020004;
     }
     public static final class id {
-        public static final int button1=0x7f070000;
-        public static final int button2=0x7f070003;
-        public static final int label=0x7f070008;
-        public static final int mapButton=0x7f070005;
-        public static final int mapview=0x7f070006;
-        public static final int phonecheckbox=0x7f070009;
-        public static final int popuptext=0x7f070007;
-        public static final int spinner1=0x7f070004;
+        public static final int button1=0x7f070006;
+        public static final int contactsbutton=0x7f070000;
+        public static final int label=0x7f07000a;
+        public static final int mButtonNo=0x7f070004;
+        public static final int mButtonYes=0x7f070003;
+        public static final int mapButton=0x7f070007;
+        public static final int mapview=0x7f070008;
+        public static final int phonecheckbox=0x7f07000b;
+        public static final int popuptext=0x7f070009;
+        public static final int spinner1=0x7f070005;
         public static final int textView1=0x7f070001;
         public static final int textView2=0x7f070002;
-        public static final int webView1=0x7f07000a;
+        public static final int webView1=0x7f07000c;
     }
     public static final class layout {
         public static final int contactslist=0x7f030000;
@@ -42,7 +44,8 @@ public final class R {
         public static final int meet=0x7f030004;
         public static final int popup=0x7f030005;
         public static final int row=0x7f030006;
-        public static final int webv=0x7f030007;
+        public static final int singleuser=0x7f030007;
+        public static final int webv=0x7f030008;
     }
     public static final class string {
         public static final int app_name=0x7f060001;

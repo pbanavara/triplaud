@@ -17,19 +17,22 @@ import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.Toast;
 
 /**
  * @author pradeep
  * Activity class to display the contact names and the phone numbers.
  */
-public class ContactsListActivity extends ListActivity {
+public class ContactsListActivity extends ListActivity implements OnClickListener{
 	private static final String TAG = "ContactsListActivity";
 	private ArrayList<Contacts> values;
 	private HttpConnectionHelper connectionHelper;
 	BestLocationFinder finder;
 	private Location location ;
-	
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -54,59 +57,9 @@ public class ContactsListActivity extends ListActivity {
 		ArrayAdapter<Contacts> adapter = new ContactsListAdapter(this, values);
 		setListAdapter(adapter);
 		setContentView(R.layout.contactslist);
+		Button cButton = (Button)findViewById(R.id.contactsbutton);
+		cButton.setOnClickListener(this);
 	}
-
-	
-	/**
-	 * @param view
-	 * Called when the confirm button is clicked. Check for selected contacts objects in the Arraylist, copy them to a JSONArray and 
-	 * send to a HttpServer. Also send SMS messages to the selected contacts.
-	 */
-	public void sendSelectedContacts(View view) {
-		try {
-		ArrayList<String> tempList = new ArrayList<String>();
-			JSONArray selectedContacts = new JSONArray();
-			for(int i=0;i<values.size();++i) {
-				Contacts contact = values.get(i);
-				if(contact.isSelected()) {
-					String name = contact.getName();
-					String id = contact.getId();
-					String phoneNumber = getPhoneNumberForContact(id);
-					String smsContact = name + "," + phoneNumber;
-					tempList.add(smsContact);
-					JSONObject newContact = new JSONObject();
-					newContact.put("NAME", contact.getName());
-					newContact.put("PHONE_NUMBER", phoneNumber);
-					newContact.put("LOC", "");
-					selectedContacts.put(newContact);
-				}
-			}	
-			JSONObject finalObject = new JSONObject();
-			finalObject.put("MYID", Common.MY_ID);
-			while(Common.getLocation() == null) {
-				Thread.sleep(100);
-			}
-			Location location = Common.getLocation();
-			String newLoc = location.getLatitude() + "," + location.getLongitude();
-			finalObject.put("MYLOCATION", newLoc);
-			finalObject.put("FRIENDS", selectedContacts);
-			Log.i("ContactsList", String.valueOf(selectedContacts.length()));
-			connectionHelper = new HttpConnectionHelper();
-			connectionHelper.postData(Common.URL + "/id=" + Common.MY_ID, finalObject);
-			
-			SendSms sendSms = new SendSms(getApplicationContext());
-			sendSms.sendBulkSms(tempList);
-			Log.i(TAG, "SMS Sent");
-			Intent mapIntent = new Intent(this, CommonMapActivity.class);
-			startActivity(mapIntent);
-			
-			
-		} catch (Exception je) {
-			je.printStackTrace();
-		}
-		
-	}
-
 	/**
 	 * @return cursor
 	 * Return the phone contacts as a cursor
@@ -125,7 +78,7 @@ public class ContactsListActivity extends ListActivity {
 				sortOrder);
 	}
 
-	
+
 	/**
 	 * @param displayName
 	 * @return phoneNumber
@@ -140,11 +93,61 @@ public class ContactsListActivity extends ListActivity {
 			while(cur.moveToNext()) {
 				phoneNumber = cur.getString(cur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
 			}
-			
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return phoneNumber;
 	}
-	
+
+	/**
+	 * @param view
+	 * Called when the confirm button is clicked. Check for selected contacts objects in the Arraylist, copy them to a JSONArray and 
+	 * send to a HttpServer. Also send SMS messages to the selected contacts.
+	 */
+@Override
+	public void onClick(View v) {
+		if(v.getId() == R.id.contactsbutton) {
+			try {
+				ArrayList<String> tempList = new ArrayList<String>();
+				JSONArray selectedContacts = new JSONArray();
+				for(int i=0;i<values.size();++i) {
+					Contacts contact = values.get(i);
+					if(contact.isSelected()) {
+						String name = contact.getName();
+						String id = contact.getId();
+						String phoneNumber = getPhoneNumberForContact(id);
+						String smsContact = name + "," + phoneNumber;
+						tempList.add(smsContact);
+						JSONObject newContact = new JSONObject();
+						newContact.put("NAME", contact.getName());
+						newContact.put("PHONE_NUMBER", phoneNumber);
+						newContact.put("LOC", "");
+						selectedContacts.put(newContact);
+					}
+				}	
+				JSONObject finalObject = new JSONObject();
+				finalObject.put("MYID", Common.MY_ID);
+				location = Common.getLocation();
+				String newLoc = location.getLatitude() + "," + location.getLongitude();
+				finalObject.put("MYLOCATION", newLoc);
+				finalObject.put("FRIENDS", selectedContacts);
+				Log.i("ContactsList", String.valueOf(selectedContacts.length()));
+				connectionHelper = new HttpConnectionHelper();
+				connectionHelper.postData(Common.URL + "/id=" + Common.MY_ID, finalObject);
+				SendSms sendSms = new SendSms(getApplicationContext());
+				sendSms.sendBulkSms(tempList);
+				
+				Log.i(TAG, "SMS Sent");
+				Intent mapIntent = new Intent(this, CommonMapActivity.class);
+				mapIntent.putExtra("singleusermode", false);
+				startActivity(mapIntent);
+
+			} catch (Exception je) {
+				je.printStackTrace();
+			}
+		
+		}
+	}
+
 }

@@ -9,27 +9,18 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:text="SocialEyez is an application that makes it convenient to schedule group meetings and get togethers. Organizers and attendees can see each other on the map and select the places of interest without making any phone calls"
+        android:text="In Single user mode, the app will simulate a friend's response to your meeting invite. Do you want to proceed"
         android:textAppearance="?android:attr/textAppearanceMedium" />
     
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/textView1"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
-        android:text="Do you want to schedule a get together/meeting now"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
-
-    <Button
+     <Button
         android:id="@+id/mButtonYes"
         android:layout_width="150dp"
         android:layout_height="wrap_content"
         android:layout_below="@+id/textView2"
         android:layout_centerVertical="true"
         android:layout_marginTop="10dp"
-         android:layout_marginLeft="100dp"
+        android:layout_marginLeft="100dp"
+        android:onClick="simulate"
         android:text="Yes" />
 
     <Button
@@ -39,6 +30,7 @@
         android:layout_alignLeft="@+id/mButtonYes"
         android:layout_below="@+id/mButtonYes"
         android:layout_marginTop="33dp"
-        android:text="No, I&apos;ll try first" />
+        android:onClick="dismiss"
+        android:text="No" />
     
 </RelativeLayout>

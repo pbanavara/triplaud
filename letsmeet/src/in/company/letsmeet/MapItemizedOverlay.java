@@ -93,6 +93,8 @@ public class MapItemizedOverlay<Item> extends ItemizedOverlay<OverlayItem> {
 	public boolean onTap(int index) {
 		super.onTap(index);
 		
+		String friendMessage = "Do you like this place";
+		String orgMessage = "Do you want to confirm this location and get directions";
 		// TODO Auto-generated method stub
 		OverlayItem item = items.get(index);
 		GeoPoint point = item.getPoint();
@@ -107,7 +109,11 @@ public class MapItemizedOverlay<Item> extends ItemizedOverlay<OverlayItem> {
 			dialog.setCancelable(true);
 			title = item.getTitle();
 			dialog.setTitle(title);
-			dialog.setMessage("Do you want to confirm this location and get directions");
+			if ( Common.isFriend() == true) {
+				dialog.setMessage(friendMessage);
+			} else { 
+				dialog.setMessage(orgMessage);
+			}
 			dialog.setPositiveButton("YES", new DialogInterface.OnClickListener(){
 				public void onClick(DialogInterface dialog, int id) {
 					try{
@@ -122,9 +128,13 @@ public class MapItemizedOverlay<Item> extends ItemizedOverlay<OverlayItem> {
 						Intent intent = new Intent(context,WebViewActivity.class);
 						intent.putExtra("SOURCE", sourceLoc);
 						intent.putExtra("DEST", destLoc);
-						context.startActivity(intent);
 						Log.e(TAG, "Location Finalized");
-						postMarkerData("yes");
+						if(Common.isFriend() == true) {
+							postMarkerData("maybe");
+						} else {
+							postMarkerData("yes");
+							context.startActivity(intent);
+						}
 						
 
 					} catch(Exception e){
@@ -132,7 +142,7 @@ public class MapItemizedOverlay<Item> extends ItemizedOverlay<OverlayItem> {
 					}
 				}
 			});
-			dialog.setNegativeButton("NO, I'll try another", new DialogInterface.OnClickListener(){
+			dialog.setNegativeButton("No,Try another", new DialogInterface.OnClickListener(){
 				public void onClick(DialogInterface dialog, int id) {
 
 				}

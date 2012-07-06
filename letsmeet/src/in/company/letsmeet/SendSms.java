@@ -11,6 +11,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.telephony.SmsManager;
 import android.util.Log;
+import android.widget.Toast;
 
 /**
  * @author pradeep
@@ -18,12 +19,13 @@ import android.util.Log;
  *
  */
 public class SendSms {
-	private static final String message = "meet-me:";
-	
+	private static String message;
 	private Context context;
-	
 	public SendSms(Context context) {
 		this.context = context;
+		Log.i(this.toString(), Common.MY_ID);
+		message = "meet-me:" + Common.MY_ID + ":";
+		Toast.makeText(context, "Sending SMS", Toast.LENGTH_LONG).show();
 	}
 	
 	public void sendBulkSms(ArrayList<String> contacts) {

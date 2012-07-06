@@ -32,6 +32,9 @@
             android:name=".LetsMeetActivity">
         </activity>
         <activity
+            android:name=".SingleUserModeActivity">
+        </activity>
+        <activity
             android:name="in.company.letsmeet.ContactsListActivity" />
         <activity
             android:name="in.company.letsmeet.ShowDialog" />

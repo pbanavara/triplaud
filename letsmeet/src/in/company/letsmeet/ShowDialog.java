@@ -12,6 +12,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
+import android.widget.Toast;
 
 
 public class ShowDialog extends Activity{
@@ -54,17 +55,19 @@ public class ShowDialog extends Activity{
 					BestLocationFinder finder = new BestLocationFinder(getApplicationContext());
 					finder.getBestLocation(System.currentTimeMillis());
 					Location loc = Common.getLocation();
-					while (loc == null) {
-						Thread.sleep(100);
-						loc = Common.getLocation();
+					if (loc == null) {
+						Toast.makeText(getApplicationContext(), "Location Fix not obtained, Application closing", Toast.LENGTH_LONG).show();
+						finish();
 					}
 					String locString = String.valueOf(loc.getLatitude()) + "," + String.valueOf(loc.getLongitude());
+					//String locString = "12.981596" + "," + "77.628913";
 					connectionHelper = new HttpConnectionHelper();
 					JSONObject obj = new JSONObject();
 					obj.put("id", myNumber);
 					obj.put("loc", locString);
 					connectionHelper.postData(Common.URL, obj);
 					Intent mapIntent = new Intent(getApplicationContext(), CommonMapActivity.class);
+					mapIntent.putExtra("singleusermode", false);
 					startActivity(mapIntent);
 				
 			} catch(Exception e){

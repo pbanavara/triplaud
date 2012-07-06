@@ -2,29 +2,40 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content" >
- <!--  
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content" >
- </LinearLayout>
--->
 
- <Button
-     android:id="@+id/button1"
-     android:layout_width="100dp"
-     android:layout_height="50dp"
-     android:layout_alignParentBottom="true"
-     android:layout_alignParentLeft="true"
-     android:text="Confirm"
-     android:onClick="sendSelectedContacts" />
+    <ListView
+        android:id="@android:id/list"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true" >
+    </ListView>
 
- <ListView
-     android:id="@android:id/list"
-     android:layout_width="wrap_content"
-     android:layout_height="200dp"
-     android:layout_alignParentLeft="true"
-     android:layout_alignParentTop="true" >
- </ListView>
- 
+    <LinearLayout
+        style="@android:style/ButtonBar"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal" >
+
+        <Button
+            android:id="@+id/contactsbutton"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:onClick="onClick"
+            android:text="Confirm" />
+<!-- 
+        <AutoCompleteTextView
+            android:id="@+id/autoCompleteTextView1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="TBD" >
+             <requestFocus />
+               </AutoCompleteTextView>
+ -->
+           
+      
+
+    </LinearLayout>
+
 </RelativeLayout>
-

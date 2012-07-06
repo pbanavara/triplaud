@@ -24,6 +24,8 @@ import com.google.android.maps.OverlayItem;
 public class WebViewActivity extends MapActivity {
 
 	private static final String TAG = "WebViewActivity";
+	private MapView mView;
+	
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -32,7 +34,7 @@ public class WebViewActivity extends MapActivity {
 			// TODO Auto-generated method stub
 			super.onCreate(savedInstanceState);
 			setContentView(R.layout.mapus);
-			MapView mView = (MapView) findViewById(R.id.mapview);
+			mView = (MapView) findViewById(R.id.mapview);
 			List<Overlay> mOverlay = mView.getOverlays();
 			MapController controller = mView.getController();
 			final String sourceLoc = getIntent().getExtras().getString("SOURCE");
@@ -65,7 +67,8 @@ public class WebViewActivity extends MapActivity {
 			mOverlay.add(sOverlay);
 			mOverlay.add(dOverlay);
 			controller.setZoom(15);
-			controller.setCenter(new GeoPoint((int)centerLat, (int)centerLong));
+			mView.setBuiltInZoomControls(true);
+			setZoom(controller, smGp, dmGp);
 			final List<Overlay> newOverlay = mView.getOverlays();
 			new Thread( new Runnable() {
 				public void run() {
@@ -83,10 +86,22 @@ public class WebViewActivity extends MapActivity {
 		// TODO Auto-generated method stub
 		return false;
 	}
+	
+	public void setZoom(MapController control, GeoPoint sourceLocation, GeoPoint destinationLocation) {
+		int zoomLat = Math.abs(destinationLocation.getLatitudeE6() - sourceLocation.getLatitudeE6());
+		int zoomLng = Math.abs(destinationLocation.getLongitudeE6() - sourceLocation.getLongitudeE6());
+		control.setCenter(new GeoPoint( ((destinationLocation.getLatitudeE6() + sourceLocation.getLatitudeE6()) / 2), ((destinationLocation.getLongitudeE6() +
+				sourceLocation.getLongitudeE6()) / 2)));
+		control.zoomToSpan(zoomLat, zoomLng);
+		//control.animateTo(new GeoPoint((sourceLocation.getLatitudeE6() + destinationLocation.getLatitudeE6() / 2), 
+				//(sourceLocation.getLongitudeE6() + destinationLocation.getLongitudeE6() / 2)));
+		
+	}
 
 	
 	public void displayRouteFromLeafLet(String sourceLoc, String destinationLoc, List<Overlay> mOverlay) {
 		try {
+			mView.invalidate();
 			String url = "http://navigation.cloudmade.com/05de9601467f4e8c9e890a2622541715/api/0.3/";
 			String newUrl = url.concat(sourceLoc).concat(",").concat(destinationLoc).concat("/car.js?tId=CloudMade");
 			//String newUrl = "http://navigation.cloudmade.com/05de9601467f4e8c9e890a2622541715/api/0.3/13.038924999999999,77.555035,12.9273097,77.5862775/car.js?tId=CloudMade";
@@ -116,6 +131,7 @@ public class WebViewActivity extends MapActivity {
 				}
 
 			}
+		
 			
 
 		} catch (Exception e) {
