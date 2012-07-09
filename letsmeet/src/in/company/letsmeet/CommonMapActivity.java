@@ -39,14 +39,13 @@ public class CommonMapActivity extends MapActivity{
 	private List<Overlay> mapOverlays;
 	private Timer timer;
 	private TimerTask doAsynchronousTask;
-	private MyLocationOverlay myOverlay;
+	
 	private MapController mapControl;
 	private String oldObject;
 	private boolean refreshFlag = false;
-	private int arraySize;
 	private Context context;
-	private boolean singleMode;
 	private boolean displayFriendToast;
+	private String displayMessage;
 
 	private HttpConnectionHelper connectionHelper = new HttpConnectionHelper();
 
@@ -89,7 +88,7 @@ public class CommonMapActivity extends MapActivity{
 		myOverlay.enableCompass();
 		mapOverlays.add(myOverlay);
 		Location loc = Common.getLocation();
-		singleMode = getIntent().getExtras().getBoolean("singleusermode");
+		//singleMode = getIntent().getExtras().getBoolean("singleusermode");
 		GeoPoint point = new GeoPoint((int) (loc.getLatitude() * 1000000),(int) (loc.getLongitude() * 1000000));
 		mapControl.setCenter(point);
 		Toast.makeText(this, "Your current location is shown, please wait for your friend's locations", Toast.LENGTH_LONG);
@@ -201,6 +200,7 @@ public class CommonMapActivity extends MapActivity{
 				if(refreshFlag) {
 				//Organizer location
 				String[] organizerLocation = ((String)object.get("MYLOCATION")).split(",");
+				String organizer = object.getString("MYID");
 				
 						GeoPoint oPoint = new GeoPoint( (int)(Double.parseDouble(organizerLocation[0]) * 1000000) , (int)(Double.parseDouble(organizerLocation[1]) * 1000000));
 						OverlayItem oItem = new OverlayItem(oPoint, "organizer location","Do you need directions to this point");
@@ -213,7 +213,7 @@ public class CommonMapActivity extends MapActivity{
 						if (!object.isNull("FRIENDS")) {
 							displayFriendToast = true;
 							JSONArray array = object.getJSONArray("FRIENDS");
-
+							displayMessage = "Friends location found";
 							for(int i=0;i<array.length();++i) {
 								JSONObject obj = (JSONObject) array.get(i);
 								String[] tempArr = obj.getString("LOC").split(",");
@@ -222,7 +222,7 @@ public class CommonMapActivity extends MapActivity{
 									Double tempLat = Double.parseDouble(tempArr[0]);
 									Double tempLon = Double.parseDouble(tempArr[1]);
 									GeoPoint point = new GeoPoint((int)(tempLat * 1000000) , (int)(tempLon * 1000000));
-									OverlayItem fItem = new OverlayItem(point,"Friend: " + id + " Location","Do you need directions to this location");
+									OverlayItem fItem = new OverlayItem(point,"Friend: " + id + " Location",organizer + ":" + id);
 									fItem.setMarker(drawable);
 									pointList.add(fItem);
 
@@ -230,11 +230,14 @@ public class CommonMapActivity extends MapActivity{
 									Log.i(TAG, "Friends location not yet obtained");
 								}
 							}
+						} else {
+							displayMessage = "Selected friends have not yet responded";
 						}
 
 						//Four square points
 						if (!object.isNull("FSITEMS")) {
 							//Toast.makeText(getApplicationContext(), "Received meeting place locations", Toast.LENGTH_SHORT).show();
+							displayMessage = "Meeting locations from FourSquare obtained, Tap on brown markers for details";
 							JSONArray fsArray = object.getJSONArray("FSITEMS");
 							for(int i=0;i<fsArray.length();++i) {
 								JSONObject obj = (JSONObject) fsArray.get(i);
@@ -245,7 +248,7 @@ public class CommonMapActivity extends MapActivity{
 								String address = obj.getString("address");
 								String selected = obj.getString("selected");
 								
-								String organizer = object.getString("MYID");
+								organizer = object.getString("MYID");
 								Double tempLat = Double.parseDouble(lat);
 								Double tempLon = Double.parseDouble(lng);
 								GeoPoint fsPoint = new GeoPoint((int)(tempLat * 1000000) , (int)(tempLon * 1000000));
@@ -262,7 +265,9 @@ public class CommonMapActivity extends MapActivity{
 								fsItem.setMarker(fsDrawable);
 								pointList.add(fsItem);	
 							}
-						}	
+						} else {
+							displayMessage = "Didn't find any meeting locations";
+						}
 						refreshFlag = false;
 						return pointList;
 				}
@@ -305,6 +310,7 @@ public class CommonMapActivity extends MapActivity{
 				Log.i(TAG, "On post execute result size" + result.size());
 				if(result.size() > 0) {
 					Log.i(TAG, "On post fired");
+					Toast.makeText(getApplicationContext(), displayMessage, Toast.LENGTH_LONG).show();
 					// The arraySize is added as an optimizer to restrict map updates
 					// TODO Auto-generated method stub			
 					//mapOverlays.clear();
