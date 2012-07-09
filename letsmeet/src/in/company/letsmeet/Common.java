@@ -14,6 +14,17 @@ public final class Common {
  public static final String SINGLE_USER_ID = "1111";
  public static final String SINGLE_USER_FRIEND_ID = "55555";
  public static boolean friend;
+ public static boolean confirm;
+ public static boolean isConfirm() {
+	return confirm;
+}
+
+public static void setConfirm(boolean confirm) {
+	Common.confirm = confirm;
+}
+
+
+ 
  public static boolean isFriend() {
 	return friend;
 }

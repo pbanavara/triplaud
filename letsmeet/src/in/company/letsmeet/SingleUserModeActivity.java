@@ -40,7 +40,7 @@ public class SingleUserModeActivity extends Activity {
 		try{
 			obj.put("id", id);
 			obj.put("loc", newLocation);
-			helper.postData(Common.URL, obj);
+			helper.postData(Common.URL + "/id=" + Common.MY_ID, obj);
 			Intent intent = new Intent(this, CommonMapActivity.class);
 			intent.putExtra("singleusermode", true);
 			startActivity(intent);

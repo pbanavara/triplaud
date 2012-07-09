@@ -29,7 +29,7 @@ public class HttpConnectionHelper {
 					try {
 					HttpClient client = new DefaultHttpClient();
 					HttpPost post = new HttpPost(url);
-					
+					Log.i(TAG, "Post URL" + url);
 					ByteArrayEntity jsonData = new ByteArrayEntity(object.toString().getBytes("UTF8"));
 					jsonData.setContentEncoding(new BasicHeader(HTTP.CONTENT_TYPE,"application/json"));
 					post.setEntity(jsonData);	

@@ -34,7 +34,6 @@ public class BestLocationFinder {
 		  String provider = (locationManager.getProvider(LocationManager.NETWORK_PROVIDER)).getName();
 		     Location location = locationManager.getLastKnownLocation(provider);
 		      if (location != null) {
-		       
 		        long time = location.getTime();
 		        if (time < minTime) {		          
 		          locationManager.requestLocationUpdates(provider, 0, 0, singeUpdateListener, context.getMainLooper());
@@ -43,7 +42,10 @@ public class BestLocationFinder {
 		        else if (time >= minTime) {
 		          Common.setLocation(location);
 		        }
-		      } 
+		      } else {
+		    	  locationManager.requestLocationUpdates(provider, 0, 0, singeUpdateListener, context.getMainLooper());
+		    	  Log.i(TAG, "Last known location null, hence trigerring new updates");
+		      }
 		      
 	  }
 	  

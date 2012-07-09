@@ -42,12 +42,14 @@ function onRequest(request,response) {
 						markSelectedPoints(org, userId, postData);
 						return;
 					}
+					storeAndroidUserData(postData);
+				/*
 				// If the initial array is empty imply this is the first request
 				if(meAndMyFriends.length > 0) {
 					for (var fIndex = 0;fIndex < meAndMyFriends.length;++fIndex) {
 						var porganizer = meAndMyFriends[fIndex];
 						// Check to make sure organizers with the same id do not get added to the global array
-						console.log("PORGANIZERR :::" + porganizer.MYID);
+						console.log("PORGANIZERR :::" + porganizer.MYID + ":" + userId);
 						if(porganizer.MYID !== userId) {
          			storeAndroidUserData(postData);
 						}
@@ -55,6 +57,7 @@ function onRequest(request,response) {
 				} else {
          	storeAndroidUserData(postData);
 				}
+				*/
 			}
       response.writeHead(200,{"Context-type":"text/html"});
       response.end();
@@ -84,7 +87,7 @@ function storeAndroidUserData(postData) {
   var data = JSON.parse(postData);
 	var organizer = data;
   var dataArray = data.FRIENDS;
-  sys.debug("data array is" + dataArray);
+  console.log("data array is" + dataArray);
   if(dataArray !== undefined || data.MYLOCATION !== undefined) {
 		sys.debug("Post sent from organizer");
 		var obtAv = calculateAverage(organizer);
@@ -96,8 +99,9 @@ function storeAndroidUserData(postData) {
 		});
 		sys.debug("Global object now is" + JSON.stringify(meAndMyFriends));
   } else {
-		sys.debug("Post sent from friends");
+		console.log("Post sent from friends");
 		var id = data.id;
+		console.log ("Friend's ID" + id);
 		var loc = data.loc;
 		for(var mIn = 0;mIn < meAndMyFriends.length; ++mIn) {
 			var org = meAndMyFriends[mIn];
@@ -216,7 +220,7 @@ function processFourSquareData(resp, organizer, flag) {
 		 //console.log("Response from FS" + JSON.stringify(resp));
 		 console.log("FLAG IN FS " + flag);
 			 var groups = resp.groups;
-			 if(groups !== null) {	
+			 if(groups !== undefined) {	
 				 var venLen = groups.length;
 				 for(var fsI = 0; fsI < venLen; ++fsI ) {
 						var items = groups[fsI].items;
@@ -247,9 +251,17 @@ function processFourSquareData(resp, organizer, flag) {
 				}
 			organizer.FSITEMS = fsObjectArray;
 			if(flag === true) {
-				meAndMyFriends.push(organizer);
+				if(meAndMyFriends.length > 0) {
+				for(var i=0;i<meAndMyFriends.length;++i) {
+					if(organizer.MYID !== meAndMyFriends[i].MYID) {
+							meAndMyFriends.push(organizer);
+					}
+				}
+				} else {
+							meAndMyFriends.push(organizer);
+				}
 			}
-			console.log("Final organizer object" + JSON.stringify(meAndMyFriends));
+			//console.log("Final organizer object" + JSON.stringify(meAndMyFriends));
 			}
 }
 

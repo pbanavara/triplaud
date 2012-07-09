@@ -15,9 +15,8 @@ public class LetsMeetActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.meet);
-		
 		Spinner spin = (Spinner)findViewById(R.id.spinner1);
-		String[] occasions = {"A drink", "Coffee", "Lunch", "Dinner"};
+		String[] occasions = {"Coffee", "Lunch", "Dinner"};
 		ArrayAdapter ap = new ArrayAdapter(this, android.R.layout.simple_spinner_item,occasions);
 		ap.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		spin.setAdapter(ap);

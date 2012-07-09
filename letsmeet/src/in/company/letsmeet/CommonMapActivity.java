@@ -117,7 +117,7 @@ public class CommonMapActivity extends MapActivity{
 						try {
 							new AddMapOverlays().execute(mapView);
 							if(displayFriendToast == true) {
-								Toast.makeText(context, "Response received from friend", Toast.LENGTH_SHORT).show();
+								//Toast.makeText(context, "Response received from friend", Toast.LENGTH_SHORT).show();
 							}
 
 						} catch (Exception e) {
@@ -184,20 +184,16 @@ public class CommonMapActivity extends MapActivity{
 			
 			try {
 				String url = null;
-				if (singleMode == true) {
-					url = Common.URL + "/id=" + Common.SINGLE_USER_ID;
-				} else {
-					url = Common.URL + "/id=" + Common.MY_ID;
-				}
+				url = Common.URL + "/id=" + Common.MY_ID;
 				String obtainedLocations = connectionHelper.getData(url);
-				Log.i(TAG, "Locations obtained from backend ::::" + url);
+				Log.i(TAG, "Locations obtained from backend ::::" + obtainedLocations);
 				JSONObject object = new JSONObject(obtainedLocations);
 				String newObject = object.toString();
 				if(oldObject == null) {
 					oldObject = object.toString();
 					refreshFlag = true;
 				}
-				if(! oldObject.equalsIgnoreCase(newObject)) {
+				if(!oldObject.equalsIgnoreCase(newObject)) {
 					refreshFlag = true;
 					oldObject = new String(newObject);
 				}
@@ -258,10 +254,7 @@ public class CommonMapActivity extends MapActivity{
 									fsDrawable = getApplicationContext().getResources().getDrawable(R.drawable.purpleicon); 
 								} else if(selected.equalsIgnoreCase("yes")) {
 									fsDrawable = getApplicationContext().getResources().getDrawable(R.drawable.greenicon);
-									/*AlertDialog.Builder dialog = new AlertDialog.Builder(context);
-									dialog.setCancelable(true);
-									dialog.show();
-									*/
+									Common.setConfirm(true);
 								} else {
 									fsDrawable = getApplicationContext().getResources().getDrawable(R.drawable.orangeicon);
 								}
@@ -269,7 +262,8 @@ public class CommonMapActivity extends MapActivity{
 								fsItem.setMarker(fsDrawable);
 								pointList.add(fsItem);	
 							}
-						}
+						}	
+						refreshFlag = false;
 						return pointList;
 				}
 			} catch (Exception e) {

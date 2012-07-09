@@ -65,7 +65,7 @@ public class ShowDialog extends Activity{
 					JSONObject obj = new JSONObject();
 					obj.put("id", myNumber);
 					obj.put("loc", locString);
-					connectionHelper.postData(Common.URL, obj);
+					connectionHelper.postData(Common.URL + "/id=" + Common.MY_ID, obj);
 					Intent mapIntent = new Intent(getApplicationContext(), CommonMapActivity.class);
 					mapIntent.putExtra("singleusermode", false);
 					startActivity(mapIntent);

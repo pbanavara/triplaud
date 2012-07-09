@@ -109,10 +109,13 @@ public class MapItemizedOverlay<Item> extends ItemizedOverlay<OverlayItem> {
 			dialog.setCancelable(true);
 			title = item.getTitle();
 			dialog.setTitle(title);
-			if ( Common.isFriend() == true) {
+			if (Common.isFriend() == true) {
 				dialog.setMessage(friendMessage);
-			} else { 
+			} else {
 				dialog.setMessage(orgMessage);
+			}
+			if (Common.isConfirm() == true){
+				dialog.setMessage("Your organzier has confirmed this location. Need directions ?");
 			}
 			dialog.setPositiveButton("YES", new DialogInterface.OnClickListener(){
 				public void onClick(DialogInterface dialog, int id) {
@@ -129,7 +132,7 @@ public class MapItemizedOverlay<Item> extends ItemizedOverlay<OverlayItem> {
 						intent.putExtra("SOURCE", sourceLoc);
 						intent.putExtra("DEST", destLoc);
 						Log.e(TAG, "Location Finalized");
-						if(Common.isFriend() == true) {
+						if(Common.isFriend() == true && Common.isConfirm() == false) {
 							postMarkerData("maybe");
 						} else {
 							postMarkerData("yes");
@@ -142,13 +145,15 @@ public class MapItemizedOverlay<Item> extends ItemizedOverlay<OverlayItem> {
 					}
 				}
 			});
-			dialog.setNegativeButton("No,Try another", new DialogInterface.OnClickListener(){
+			dialog.setNegativeButton("No", new DialogInterface.OnClickListener(){
 				public void onClick(DialogInterface dialog, int id) {
-
+					if(Common.isFriend() == false) {
+						postMarkerData("maybe");
+					}
 				}
 			});
 			dialog.show();
-			postMarkerData("maybe");
+			//postMarkerData("maybe");
 		return true;
 	}
 

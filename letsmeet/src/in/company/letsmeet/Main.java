@@ -82,7 +82,7 @@ public class Main extends Activity implements OnClickListener{
 				String newLoc = location.getLatitude() + "," + location.getLongitude();
 				finalObject.put("MYLOCATION", newLoc);
 				finalObject.put("FRIENDS", selectedContacts);
-				finalObject.put("MYID", Common.SINGLE_USER_ID);
+				finalObject.put("MYID", Common.MY_ID);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -90,7 +90,13 @@ public class Main extends Activity implements OnClickListener{
 			intent.putExtra("singleusermode", singleUserModeFlag);
 			intent.putExtra("id", Common.SINGLE_USER_FRIEND_ID);
 			HttpConnectionHelper helper = new HttpConnectionHelper();
-			helper.postData(Common.URL + "/id=" + Common.SINGLE_USER_ID, finalObject);
+			helper.postData(Common.URL + "/id=" + Common.MY_ID, finalObject);
+			try {
+				Thread.sleep(5000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			startActivity(intent);
 		}
 }
