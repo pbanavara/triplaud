@@ -36,8 +36,9 @@ public class SendSms {
 			String[] name = ((String)iterator.next()).split(",");
 			String phoneNumber = name[1];
 			String cName = name[0];
+			String friend_id = name[2];
 			Log.i(this.toString(), "Contact name" + cName + "Contact Number" + phoneNumber);
-			String newMessage = message + phoneNumber;
+			String newMessage = message + phoneNumber + ":" + friend_id;
 			
 			if(phoneNumber != null && phoneNumber.length()>0) {
 				sendSms(phoneNumber, newMessage);

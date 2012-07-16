@@ -54,7 +54,7 @@ public class HttpConnectionHelper {
 	public String getData(String url) {
 	String newLine = "";
 	try{
-		Log.i(TAG, "In Get Request");
+		Log.i(TAG, "In Get Request::::" + url);
 		HttpClient client = new DefaultHttpClient();
 		HttpGet getRequest = new HttpGet(url);
 		getRequest.setHeader(HTTP.CONTENT_TYPE, "application/json");

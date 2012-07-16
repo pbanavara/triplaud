@@ -31,7 +31,7 @@ import com.google.android.maps.OverlayItem;
  * Refer to this URL on how these are rectified.
  * http://developmentality.wordpress.com/2009/10/19/android-itemizedoverlay-arrayindexoutofboundsexception-nullpointerexception-workarounds/#comment-815
  */
-public class MapItemizedOverlay<Item> extends ItemizedOverlay<OverlayItem> {
+public class DirectionsItemizedOverlay<Item> extends ItemizedOverlay<OverlayItem> {
 	private static final String TAG = "MapItemizedOverlay";
 	private ArrayList<OverlayItem> items = new ArrayList<OverlayItem>();
 	private HttpConnectionHelper helper;
@@ -42,12 +42,12 @@ public class MapItemizedOverlay<Item> extends ItemizedOverlay<OverlayItem> {
 	private String markerId;
 
 
-	public MapItemizedOverlay(Drawable defaultMarker) {
+	public DirectionsItemizedOverlay(Drawable defaultMarker) {
 		super(boundCenterBottom(defaultMarker));
 		// TODO Auto-generated constructor stub
 	}
 
-	public MapItemizedOverlay(Drawable defaultMarker, Context context, MapView mapView) {
+	public DirectionsItemizedOverlay(Drawable defaultMarker, Context context, MapView mapView) {
 		super(boundCenterBottom(defaultMarker));
 		this.context = context;
 
@@ -61,7 +61,7 @@ public class MapItemizedOverlay<Item> extends ItemizedOverlay<OverlayItem> {
 
 
 
-	public MapItemizedOverlay(Drawable defaultMarker, Context context, View view) {
+	public DirectionsItemizedOverlay(Drawable defaultMarker, Context context, View view) {
 		super(boundCenterBottom(defaultMarker));
 		this.context = context;
 		// Workaround for bug that Google refuses to fix:
@@ -93,68 +93,20 @@ public class MapItemizedOverlay<Item> extends ItemizedOverlay<OverlayItem> {
 	@Override
 	public boolean onTap(int index) {
 		super.onTap(index);
-		
-		String friendMessage = "Do you like this place";
-		String orgMessage = "Confirm this location, broadcast the message and get directions";
 		// TODO Auto-generated method stub
 		OverlayItem item = items.get(index);
-		GeoPoint point = item.getPoint();
-		String message = item.getSnippet();
-		String[] organizerArr = message.split(":");
-		if(organizerArr.length > 1) {
-			organizer = organizerArr[0];
-			markerId  = organizerArr[1];
-		}
-			this.tappedPoint = point;
 			Log.e(TAG, "Marker tapped");
-			
 			AlertDialog.Builder dialog = new AlertDialog.Builder(context);
-			dialog.setCancelable(true);
+			dialog.setCancelable(false);
 			title = item.getTitle();
 			dialog.setTitle(title);
-			if (Common.isFriend() == true) {
-				dialog.setMessage(friendMessage);
-			} else {
-				dialog.setMessage(orgMessage);
-			}
-			if (Common.isFriend() == true && Common.isConfirm() == true){
-				dialog.setMessage("Your organzier has confirmed this location. Need directions ?");
-			}
+			dialog.setMessage(item.getSnippet());
 			dialog.setPositiveButton("YES", new DialogInterface.OnClickListener(){
 				public void onClick(DialogInterface dialog, int id) {
-					try{
-						Location location = Common.getLocation();
-						if(location == null) {
-							BestLocationFinder finder = new BestLocationFinder(context, LocationManager.NETWORK_PROVIDER,0,false);
-							finder.getBestLocation(System.currentTimeMillis());
-						}
-
-						String sourceLoc = String.valueOf(location.getLatitude()) + "," + String.valueOf(location.getLongitude());
-						String destLoc = String.valueOf(tappedPoint.getLatitudeE6() / 1E6) + "," + String.valueOf(tappedPoint.getLongitudeE6() / 1E6);	
-						Intent intent = new Intent(context,WebViewActivity.class);
-						intent.putExtra("SOURCE", sourceLoc);
-						intent.putExtra("DEST", destLoc);
-						Log.e(TAG, "Location Finalized");
-						if(Common.isFriend() == true && Common.isConfirm() == false) {
-							postMarkerData("maybe");
-						} else {
-							postMarkerData("yes");
-							context.startActivity(intent);
-						}
 						
-
-					} catch(Exception e){
-						e.printStackTrace();
-					}
 				}
 			});
-			dialog.setNegativeButton("No", new DialogInterface.OnClickListener(){
-				public void onClick(DialogInterface dialog, int id) {
-					if(Common.isFriend() == false) {
-						postMarkerData("maybe");
-					}
-				}
-			});
+			
 			dialog.show();
 			//postMarkerData("maybe");
 		return true;
@@ -164,25 +116,6 @@ public class MapItemizedOverlay<Item> extends ItemizedOverlay<OverlayItem> {
 		items.clear();
 		setLastFocusedIndex(-1);
 		populate();
-	}
-
-	public void postMarkerData(String selected) {
-		try {
-			helper = new HttpConnectionHelper();
-			JSONObject obj = new JSONObject();
-			obj.put("selected",selected);
-			if(markerId != null || !markerId.equalsIgnoreCase("")) {
-				helper.postData(Common.URL + "/id=" + markerId + "&organizer=" + organizer, obj);
-				Log.i(TAG , "data sent");
-			} else {
-				Log.i(TAG, "Either Friend or Organizer marker tapped, no need to push data to backend");
-			}
-			
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
 	}
 
 }

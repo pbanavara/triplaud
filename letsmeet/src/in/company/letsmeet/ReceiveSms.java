@@ -4,6 +4,7 @@ import in.company.letsmeet.locationutil.BestLocationFinder;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.telephony.SmsMessage;
 import android.util.Log;
@@ -19,7 +20,7 @@ public class ReceiveSms extends BroadcastReceiver {
 	 */
 	public void onReceive(Context context, Intent intent) {
 		// TODO Auto-generated method stub
-		BestLocationFinder finder = new BestLocationFinder(context);
+		BestLocationFinder finder = new BestLocationFinder(context, LocationManager.NETWORK_PROVIDER,0,false);
 		finder.getBestLocation(System.currentTimeMillis());
 		Bundle bundle = intent.getExtras();
 		System.out.println("In the SMS Receive body");
@@ -38,10 +39,11 @@ public class ReceiveSms extends BroadcastReceiver {
 				Log.i(TAG, "ORG ID" + splitMessage[1]);
 				Common.MY_ID = splitMessage[1];
 				String myNumber = splitMessage[2];
+				String friend_id = splitMessage[3];
 				Intent showDialogIntent = new Intent(context, ShowDialog.class);
 				showDialogIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);	
 				showDialogIntent.putExtra("sender", address);
-				showDialogIntent.putExtra("mynumber", myNumber);
+				showDialogIntent.putExtra("mynumber",friend_id);
 				context.startActivity(showDialogIntent);
 			}
 		}

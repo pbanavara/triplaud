@@ -3,6 +3,7 @@ package in.company.letsmeet;
 import in.company.letsmeet.locationutil.BestLocationFinder;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -12,6 +13,7 @@ import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.Cursor;
 import android.location.Location;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
@@ -36,7 +38,7 @@ public class ContactsListActivity extends ListActivity implements OnClickListene
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		finder = new BestLocationFinder(getApplicationContext());
+		finder = new BestLocationFinder(getApplicationContext(), LocationManager.NETWORK_PROVIDER,0,false);
 		finder.getBestLocation(System.currentTimeMillis());
 		Cursor mCursor = getContacts();
 		startManagingCursor(mCursor);
@@ -109,7 +111,7 @@ public class ContactsListActivity extends ListActivity implements OnClickListene
 	public void onClick(View v) {
 		if(v.getId() == R.id.contactsbutton) {
 			try {
-				ArrayList<String> tempList = new ArrayList<String>();
+				ArrayList<String> smsContactList = new ArrayList<String>();
 				JSONArray selectedContacts = new JSONArray();
 				for(int i=0;i<values.size();++i) {
 					Contacts contact = values.get(i);
@@ -117,11 +119,12 @@ public class ContactsListActivity extends ListActivity implements OnClickListene
 						String name = contact.getName();
 						String id = contact.getId();
 						String phoneNumber = getPhoneNumberForContact(id);
-						String smsContact = name + "," + phoneNumber;
-						tempList.add(smsContact);
+						String friend_id = String.valueOf(new Random().nextInt(Integer.MAX_VALUE) +1);
+						String smsContact = name + "," + phoneNumber + ","  + friend_id;
+						smsContactList.add(smsContact);
 						JSONObject newContact = new JSONObject();
 						newContact.put("NAME", contact.getName());
-						newContact.put("PHONE_NUMBER", phoneNumber);
+						newContact.put("PHONE_NUMBER", friend_id);
 						newContact.put("LOC", "");
 						selectedContacts.put(newContact);
 					}
@@ -136,8 +139,7 @@ public class ContactsListActivity extends ListActivity implements OnClickListene
 				connectionHelper = new HttpConnectionHelper();
 				connectionHelper.postData(Common.URL + "/id=" + Common.MY_ID, finalObject);
 				SendSms sendSms = new SendSms(getApplicationContext());
-				sendSms.sendBulkSms(tempList);
-				
+				sendSms.sendBulkSms(smsContactList);	
 				Log.i(TAG, "SMS Sent");
 				Intent mapIntent = new Intent(this, CommonMapActivity.class);
 				mapIntent.putExtra("singleusermode", false);

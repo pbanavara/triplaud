@@ -3,24 +3,25 @@ package in.company.letsmeet;
 import in.company.letsmeet.locationutil.BestLocationFinder;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.google.android.maps.GeoPoint;
@@ -44,7 +45,7 @@ public class CommonMapActivity extends MapActivity{
 	private String oldObject;
 	private boolean refreshFlag = false;
 	private Context context;
-	private boolean displayFriendToast;
+
 	private String displayMessage;
 
 	private HttpConnectionHelper connectionHelper = new HttpConnectionHelper();
@@ -69,9 +70,10 @@ public class CommonMapActivity extends MapActivity{
 	@Override
 	protected void onCreate(Bundle bundle) {
 		// TODO Auto-generated method stub
+		Common.friendMap = new HashMap<String, TrackerPoint>();
 		super.onCreate(bundle);
 		this.context = getApplicationContext();
-		BestLocationFinder finder = new BestLocationFinder(getApplicationContext());
+		BestLocationFinder finder = new BestLocationFinder(getApplicationContext(), LocationManager.NETWORK_PROVIDER,0, false);
 		finder.getBestLocation(System.currentTimeMillis());
 		drawable = this.getResources().getDrawable(R.drawable.marker);
 		fsDrawable = getApplicationContext().getResources().getDrawable(R.drawable.orangeicon);
@@ -96,6 +98,11 @@ public class CommonMapActivity extends MapActivity{
 		mapView.setBuiltInZoomControls(true);    
 		toCallAsynchronous(mapView);
 		Toast.makeText(getApplicationContext(), "Please wait while we retrieve locations",Toast.LENGTH_LONG).show();
+		Button trackYes = (Button)findViewById(R.id.enableTrackButton);
+		trackYes.setVisibility(View.INVISIBLE);
+		Button trackNo = (Button)findViewById(R.id.disableTrackButton);
+		trackNo.setVisibility(View.INVISIBLE);
+		
 
 	}
 
@@ -115,9 +122,6 @@ public class CommonMapActivity extends MapActivity{
 					public void run() {
 						try {
 							new AddMapOverlays().execute(mapView);
-							if(displayFriendToast == true) {
-								//Toast.makeText(context, "Response received from friend", Toast.LENGTH_SHORT).show();
-							}
 
 						} catch (Exception e) {
 							e.printStackTrace();
@@ -130,7 +134,8 @@ public class CommonMapActivity extends MapActivity{
 
 		};
 		// Find out an optimized timer frequency.
-		timer.schedule(doAsynchronousTask,0,5000);
+		timer.schedule(doAsynchronousTask,2000,10000);
+		
 	}
 
 	@Override
@@ -145,6 +150,7 @@ public class CommonMapActivity extends MapActivity{
 	protected void onResume() {
 		// TODO Auto-generated method stub
 		super.onResume();
+		//timer.schedule(doAsynchronousTask,0,10000);
 	}
 
 	@Override
@@ -198,6 +204,7 @@ public class CommonMapActivity extends MapActivity{
 				}
 				
 				if(refreshFlag) {
+					
 				//Organizer location
 				String[] organizerLocation = ((String)object.get("MYLOCATION")).split(",");
 				String organizer = object.getString("MYID");
@@ -207,25 +214,38 @@ public class CommonMapActivity extends MapActivity{
 						Drawable ordrawable = getResources().getDrawable(R.drawable.greenicon);
 						oItem.setMarker(ordrawable);
 						pointList.add(oItem);
-
+						//Adding the organizer to the tracking HashMap
+						TrackerPoint toPoint = new TrackerPoint();
+						toPoint.setInitialPoint(oPoint);
+						toPoint.setName("organizer");
+						if (!Common.friendMap.containsKey(organizer)) {
+							Common.friendMap.put(organizer, toPoint);
+						}
 
 						//Friends locations
 						if (!object.isNull("FRIENDS")) {
-							displayFriendToast = true;
 							JSONArray array = object.getJSONArray("FRIENDS");
 							displayMessage = "Friends location found";
 							for(int i=0;i<array.length();++i) {
 								JSONObject obj = (JSONObject) array.get(i);
 								String[] tempArr = obj.getString("LOC").split(",");
 								String id = obj.getString("PHONE_NUMBER");
+								String name = obj.getString("NAME");
 								if (tempArr.length > 1) {
 									Double tempLat = Double.parseDouble(tempArr[0]);
 									Double tempLon = Double.parseDouble(tempArr[1]);
 									GeoPoint point = new GeoPoint((int)(tempLat * 1000000) , (int)(tempLon * 1000000));
-									OverlayItem fItem = new OverlayItem(point,"Friend: " + id + " Location",organizer + ":" + id);
+									//HashMap<String, GeoPoint> mapId = new HashMap<String, GeoPoint>();
+									TrackerPoint friendPoint = new TrackerPoint();
+									friendPoint.setInitialPoint(point);
+									friendPoint.setName(name);
+								
+									if (!Common.friendMap.containsKey(id)) {
+										Common.friendMap.put(id, friendPoint);
+									}
+									OverlayItem fItem = new OverlayItem(point,"Friend: " + name, organizer + ":" + id);
 									fItem.setMarker(drawable);
 									pointList.add(fItem);
-
 								} else {
 									Log.i(TAG, "Friends location not yet obtained");
 								}
@@ -237,7 +257,7 @@ public class CommonMapActivity extends MapActivity{
 						//Four square points
 						if (!object.isNull("FSITEMS")) {
 							//Toast.makeText(getApplicationContext(), "Received meeting place locations", Toast.LENGTH_SHORT).show();
-							displayMessage = "Meeting locations from FourSquare obtained, Tap on brown markers for details";
+							displayMessage = "Meeting locations from FourSquare obtained, Tap the restaurant markers for details";
 							JSONArray fsArray = object.getJSONArray("FSITEMS");
 							for(int i=0;i<fsArray.length();++i) {
 								JSONObject obj = (JSONObject) fsArray.get(i);
@@ -312,8 +332,6 @@ public class CommonMapActivity extends MapActivity{
 					Log.i(TAG, "On post fired");
 					Toast.makeText(getApplicationContext(), displayMessage, Toast.LENGTH_LONG).show();
 					// The arraySize is added as an optimizer to restrict map updates
-					// TODO Auto-generated method stub			
-					//mapOverlays.clear();
 					itemizedOverlay.clear();
 					Iterator<OverlayItem> iterator = result.iterator();		
 					while(iterator.hasNext()) {					
@@ -340,7 +358,7 @@ public class CommonMapActivity extends MapActivity{
 					mapOverlays.add(itemizedOverlay);
 					Log.i("zoom", "zoom values ::" + maxLat + ":" + minLat +":" + maxLng +":" + minLng);
 					mapControl.setCenter(new GeoPoint( ((maxLat + minLat )/ 2), ((maxLng + minLng) /2)));
-					mapControl.zoomToSpan(maxLat - minLat, maxLng - minLng);
+					mapControl.zoomToSpan( (int)((maxLat - minLat)*1.5), (int)((maxLng - minLng)*1.5));
 					mapView.invalidate();
 				}
 

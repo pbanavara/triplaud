@@ -12,6 +12,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.location.Criteria;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -32,7 +33,7 @@ public class Main extends Activity implements OnClickListener{
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		this.context = getApplicationContext();
-		BestLocationFinder finder = new BestLocationFinder(getApplicationContext());
+		BestLocationFinder finder = new BestLocationFinder(getApplicationContext(), LocationManager.NETWORK_PROVIDER,0,false);
 		finder.getBestLocation(System.currentTimeMillis());
 		Common.MY_ID = String.valueOf(new Random().nextInt(Integer.MAX_VALUE) +1);
 		Criteria criteria = new Criteria();

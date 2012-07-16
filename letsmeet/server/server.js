@@ -13,7 +13,6 @@
 **/
 
 
-
 var http = require("http");
 var https = require("https");
 var url = require("url");
@@ -43,22 +42,7 @@ function onRequest(request,response) {
 						return;
 					}
 					storeAndroidUserData(postData);
-				/*
-				// If the initial array is empty imply this is the first request
-				if(meAndMyFriends.length > 0) {
-					for (var fIndex = 0;fIndex < meAndMyFriends.length;++fIndex) {
-						var porganizer = meAndMyFriends[fIndex];
-						// Check to make sure organizers with the same id do not get added to the global array
-						console.log("PORGANIZERR :::" + porganizer.MYID + ":" + userId);
-						if(porganizer.MYID !== userId) {
-         			storeAndroidUserData(postData);
-						}
-					}
-				} else {
-         	storeAndroidUserData(postData);
 				}
-				*/
-			}
       response.writeHead(200,{"Context-type":"text/html"});
       response.end();
 		});
@@ -77,7 +61,7 @@ function onRequest(request,response) {
 		
 }
 
-http.createServer(onRequest).listen(8888);
+http.createServer(onRequest).listen(8889);
 
 
 /*
@@ -91,13 +75,23 @@ function storeAndroidUserData(postData) {
   if(dataArray !== undefined || data.MYLOCATION !== undefined) {
 		sys.debug("Post sent from organizer");
 		var obtAv = calculateAverage(organizer);
-		organizer.average = obtAv;	
+		if(organizer.average === undefined) {
+			organizer.average = obtAv;	
 			getFourSquareData(obtAv, function(tempp) {
 	 	  var resp = tempp.response;
 			// The true flag is added so that only the organizer objects are pushed to the main array
 			processFourSquareData(resp, organizer, true);
+				console.log ("Four square API called for the first organizer  Average" + new Date().toISOString());
 		});
-		sys.debug("Global object now is" + JSON.stringify(meAndMyFriends));
+		} else if(organizer.average !== obtAv) {
+				getFourSquareData(obtAv, function(tempp) {
+	 	 		 var resp = tempp.response;
+				// The true flag is added so that only the organizer objects are pushed to the main array
+				processFourSquareData(resp, organizer, true);
+				console.log ("Four square API called for a new organizer Average" + new Date().toISOString());
+			});
+			organizer.average = obtAv;
+			}
   } else {
 		console.log("Post sent from friends");
 		var id = data.id;
@@ -115,11 +109,23 @@ function storeAndroidUserData(postData) {
 						}	
 			}
 			var frAvg = calculateAverage(org);
-			org.average = obtAv;
-			getFourSquareData(frAvg, function(temp) {
-	 	  	var resp = temp.response;
-				processFourSquareData(resp, org, false);
-			});
+			if(org.average === undefined) {
+				org.average = frAvg;	
+				getFourSquareData(frAvg, function(temp) {
+	 	 		 var resp = temp.response;
+				console.log ("Four square API called for the first Friend's Average" + new Date().toISOString());
+					// The true flag is added so that only the organizer objects are pushed to the main array
+					processFourSquareData(resp, org, false);
+				});
+			} else if(org.average !== frAvg) {
+				getFourSquareData(frAvg, function(temp) {
+	 	 		 	var resp = temp.response;
+					// The true flag is added so that only the organizer objects are pushed to the main array
+					processFourSquareData(resp, org, false);
+				console.log ("Four square API called for a new Friend's Average" + new Date().toISOString());
+					org.average = frAvg;
+				});
+			}
 			
 		}
 	}
@@ -141,7 +147,7 @@ function getFourSquareData(average, getData) {
 			temp = temp.concat(chunk);
 		});
 		res.on('end', function() {
-			//console.log("Inside the foursquare method" + JSON.stringify(temp));
+			console.log("Foursquare method returned" + new Date().toISOString());
 			getData(JSON.parse(temp));
 		});
 	}).on('error', function(e) {
@@ -218,7 +224,6 @@ function markSelectedPoints(org, id, postData) {
 
 function processFourSquareData(resp, organizer, flag) {
 		 //console.log("Response from FS" + JSON.stringify(resp));
-		 console.log("FLAG IN FS " + flag);
 			 var groups = resp.groups;
 			 if(groups !== undefined) {	
 				 var venLen = groups.length;

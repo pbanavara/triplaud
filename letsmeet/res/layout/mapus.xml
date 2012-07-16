@@ -2,32 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent" >
-   <TextView
-        android:id="@+id/textView1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="4dp"
-        android:text="Your current location is displayed, please click ok to view other's locations and meeting places"
-        android:textAppearance="?android:attr/textAppearanceSmall" /> 
-     <Button
-        android:id="@+id/mapButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        
-        android:text="ok" />
-    <!--  
-   <WebView  xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/webView1"
-    android:layout_below="@id/textView1"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-	/>
-	-->
-	
-	<com.google.android.maps.MapView
+   	<com.google.android.maps.MapView
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/mapview"
     android:layout_width="fill_parent"
@@ -35,6 +10,18 @@
     android:clickable="true"
     android:apiKey="0SnFAsCYe_q4CcChsvDSegqZJLX03RfEkQbonXA"
 />
+    <Button
+        android:id="@+id/enableTrackButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="false"     
+        android:text="Enable Tracking" />
     
+     <Button
+        android:id="@+id/disableTrackButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"     
+        android:text="Disable Tracking" />
 
 </RelativeLayout>

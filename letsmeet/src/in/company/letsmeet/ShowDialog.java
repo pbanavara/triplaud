@@ -11,6 +11,7 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.widget.Toast;
 
@@ -52,7 +53,7 @@ public class ShowDialog extends Activity{
 		public void onClick(DialogInterface dialog, int which) {
 			try{
 				//Push the current location to the back-end server as a JSON object.
-					BestLocationFinder finder = new BestLocationFinder(getApplicationContext());
+					BestLocationFinder finder = new BestLocationFinder(getApplicationContext(),LocationManager.NETWORK_PROVIDER,0,false);
 					finder.getBestLocation(System.currentTimeMillis());
 					Location loc = Common.getLocation();
 					if (loc == null) {
