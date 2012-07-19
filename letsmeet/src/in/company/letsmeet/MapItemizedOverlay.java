@@ -1,5 +1,7 @@
 package in.company.letsmeet;
 
+import in.company.letsmeet.common.Common;
+import in.company.letsmeet.common.HttpConnectionHelper;
 import in.company.letsmeet.locationutil.BestLocationFinder;
 
 import java.util.ArrayList;
@@ -125,8 +127,8 @@ public class MapItemizedOverlay<Item> extends ItemizedOverlay<OverlayItem> {
 					try{
 						Location location = Common.getLocation();
 						if(location == null) {
-							BestLocationFinder finder = new BestLocationFinder(context, LocationManager.NETWORK_PROVIDER,0,false);
-							finder.getBestLocation(System.currentTimeMillis());
+							BestLocationFinder finder = new BestLocationFinder(context, LocationManager.NETWORK_PROVIDER,false);
+							finder.getBestLocation(System.currentTimeMillis(),0);
 						}
 
 						String sourceLoc = String.valueOf(location.getLatitude()) + "," + String.valueOf(location.getLongitude());

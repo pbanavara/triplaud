@@ -1,7 +1,8 @@
 /**
  * 
  */
-package in.company.letsmeet;
+package in.company.letsmeet.common;
+
 
 import java.util.ArrayList;
 import java.util.Iterator;

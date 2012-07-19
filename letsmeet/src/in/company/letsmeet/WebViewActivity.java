@@ -1,5 +1,7 @@
 package in.company.letsmeet;
 
+import in.company.letsmeet.common.Common;
+import in.company.letsmeet.common.HttpConnectionHelper;
 import in.company.letsmeet.locationutil.BestLocationFinder;
 
 import java.io.BufferedReader;
@@ -17,11 +19,16 @@ import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
@@ -45,6 +52,7 @@ public class WebViewActivity extends MapActivity {
 
 	private static final String TAG = "WebViewActivity";
 	private MapView mView;
+	private BestLocationFinder finder;
 	private LocationManager locationManager;
 	DirectionsItemizedOverlay<OverlayItem> sOverlay;
 
@@ -53,28 +61,25 @@ public class WebViewActivity extends MapActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		try {
 			super.onCreate(savedInstanceState);
+			finder = new BestLocationFinder(getApplicationContext(), LocationManager.GPS_PROVIDER, true);
 			setContentView(R.layout.mapus);
 
 			mView = (MapView) findViewById(R.id.mapview);
 			List<Overlay> mOverlay = mView.getOverlays();
 			MapController controller = mView.getController();
-			//final String sourceLoc = getIntent().getExtras().getString("SOURCE");
+		
 			final String destinationLoc = getIntent().getExtras().getString("DEST");
 
 			/*
-			 * Obtain source and destination addresses, put markers for those addresses.
+			 * Obtain destination address, put markers for those addresses.
 			 */
-			//String[] sourceArr = sourceLoc.split(",");
 			String[] destinationArr = destinationLoc.split(",");
-			//double sLoc = Double.parseDouble(sourceArr[0]) * 1e6;
-			//double sLon = Double.parseDouble(sourceArr[1]) * 1e6;
 			double dLoc = Double.parseDouble(destinationArr[0]) * 1e6;
 			double dLon = Double.parseDouble(destinationArr[1]) * 1e6;
-		//	GeoPoint smGp = new GeoPoint((int)sLoc, (int)sLon);
 			GeoPoint dmGp = new GeoPoint((int)dLoc, (int)dLon);
+			setZoom(mView.getController(), dmGp, Common.friendMap);
 			Drawable sDrawable = getApplicationContext().getResources().getDrawable(R.drawable.marker); 
 			Drawable dDrawable = getApplicationContext().getResources().getDrawable(R.drawable.greenicon);
-		//	OverlayItem sItem = new OverlayItem(smGp, "", "");
 			OverlayItem dItem = new OverlayItem(dmGp, "", "");
 
 			/*
@@ -82,7 +87,6 @@ public class WebViewActivity extends MapActivity {
 			 */
 			sOverlay = new DirectionsItemizedOverlay<OverlayItem>(sDrawable, this, mView);
 			DirectionsItemizedOverlay<OverlayItem> dOverlay = new DirectionsItemizedOverlay<OverlayItem>(dDrawable, this, mView);
-		//	sOverlay.addOverlay(sItem);
 			dOverlay.addOverlay(dItem);
 			mOverlay.add(sOverlay);
 			mOverlay.add(dOverlay);
@@ -90,7 +94,7 @@ public class WebViewActivity extends MapActivity {
 			mView.setBuiltInZoomControls(true);
 			
 			final List<Overlay> newOverlay = mView.getOverlays();
-			//mView.invalidate();
+			
 			new Thread( new Runnable() {
 				public void run() {
 					int color = 999;
@@ -113,8 +117,8 @@ public class WebViewActivity extends MapActivity {
 						Log.i(TAG, "Destination location" + destinationLoc);
 						displayRouteFromLeafLet(friendLoc, destinationLoc, newOverlay, color);
 						color = color - 50;
-						setZoom(mView.getController(), point, Common.friendMap);
 					}
+					
 				}
 			}).start();
 			
@@ -128,39 +132,39 @@ public class WebViewActivity extends MapActivity {
 		 */
 		Button trackYes = (Button)findViewById(R.id.enableTrackButton);
 		trackYes.setEnabled(true);
-		//Button trackNo = (Button)findViewById(R.id.enableTrackButton);
-		//trackYes.setEnabled(true);
+		Button trackNo = (Button)findViewById(R.id.disableTrackButton);
+		trackNo.setEnabled(true);
+		locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+		
 		trackYes.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
 				if (v.getId() == R.id.enableTrackButton) {
-					pushLocationUpdates(Common.UPDATE_PARSE_FREQUENCY);
+					Toast.makeText(getApplicationContext(), "Your location will be uploaded every 2 minutes for tracking purposes", Toast.LENGTH_LONG).show();
+					locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 120000, 1, listener);
 					getAndDisplayLocationUpdates(Common.friendMap);
-				} else if (v.getId() == R.id.disableTrackButton) {
-					//Add code to disable location updates.
+				} 
+			}
+		});
+		
+		trackNo.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				if (v.getId() == R.id.disableTrackButton) {
+					Log.i(TAG,"Location listener disabled");
+					locationManager.removeUpdates(listener);
 				}
 			}
 		});
+		
 	}
-
-	/**
-	 * @param frequency
-	 * Push the current location update and my Id to parse at a specified interval.
-	 */
-	private void pushLocationUpdates(long frequency) {
-		Log.i(TAG, "Location updates invoked");
-		BestLocationFinder finder = new BestLocationFinder(getApplicationContext(), LocationManager.GPS_PROVIDER, frequency, true);
-		finder.getBestLocation(System.currentTimeMillis());
-	}
-
 
 	@Override
 	protected void onDestroy() {
 		// TODO Auto-generated method stub
 		super.onDestroy();
-
-
+		locationManager.removeUpdates(listener);
 	}
 
 	/**
@@ -250,26 +254,13 @@ public class WebViewActivity extends MapActivity {
 		}).start();
 	}
 
-
-
 	@Override
 	protected boolean isRouteDisplayed() {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
-	/*
-	 * Not used as of now.
-	 */
-	public void setZoom(MapController control, GeoPoint sourceLocation, GeoPoint destinationLocation) {
-		int zoomLat = Math.abs(destinationLocation.getLatitudeE6() - sourceLocation.getLatitudeE6());
-		int zoomLng = Math.abs(destinationLocation.getLongitudeE6() - sourceLocation.getLongitudeE6());
-		control.setCenter(new GeoPoint( ((destinationLocation.getLatitudeE6() + sourceLocation.getLatitudeE6()) / 2), ((destinationLocation.getLongitudeE6() +
-				sourceLocation.getLongitudeE6()) / 2)));
-		control.zoomToSpan(zoomLat, zoomLng);
-
-	}
-
+	
 	/**
 	 * @param control
 	 * @param sourceLocation
@@ -277,9 +268,9 @@ public class WebViewActivity extends MapActivity {
 	 * Calculates the center and zooms the map based on the source location and a list of destination locations. Source is the originator's address.
 	 * Destination addresses are the addresses of all friends involved in the session.
 	 */
-	public void setZoom(MapController control, GeoPoint sourceLocation, HashMap<String, TrackerPoint> destinationLocations) {
+	public void setZoom(MapController control, GeoPoint restaurantLocation, HashMap<String, TrackerPoint> sourceLocations) {
 
-		Collection<TrackerPoint> list = (Collection<TrackerPoint>)destinationLocations.values();
+		Collection<TrackerPoint> list = (Collection<TrackerPoint>)sourceLocations.values();
 		Iterator<TrackerPoint> iterator = list.iterator();	
 		int maxLat = Integer.MIN_VALUE;
 		int maxLng = Integer.MIN_VALUE;	
@@ -294,10 +285,10 @@ public class WebViewActivity extends MapActivity {
 				maxLng = lng;
 			}
 
-			int zoomLat = (int) (Math.abs(maxLat - sourceLocation.getLatitudeE6()) * 1.5);
-			int zoomLng = (int) (Math.abs(maxLng - sourceLocation.getLongitudeE6()) * 1.5);
-			control.setCenter(new GeoPoint( ((maxLat + sourceLocation.getLatitudeE6()) / 2), ((maxLng +
-					sourceLocation.getLongitudeE6()) / 2)));
+			int zoomLat = (int) (Math.abs(maxLat - restaurantLocation.getLatitudeE6()) * 1.5);
+			int zoomLng = (int) (Math.abs(maxLng - restaurantLocation.getLongitudeE6()) * 1.5);
+			control.setCenter(new GeoPoint( ((maxLat + restaurantLocation.getLatitudeE6()) / 2), ((maxLng +
+					restaurantLocation.getLongitudeE6()) / 2)));
 			control.zoomToSpan(zoomLat, zoomLng);
 
 		}
@@ -347,6 +338,67 @@ public class WebViewActivity extends MapActivity {
 		}
 	}
 	
-	
+	private LocationListener listener = new LocationListener() {
+		   
+		public void onLocationChanged(Location location) {
+	      Log.d(TAG, "Updated location" + location.getLatitude() + "," + location.getLongitude());
+	      uploadDataToParse(location);
+	      
+	    }
+	    
+	   
+		@Override
+		public void onStatusChanged(String provider, int status, Bundle extras) {
+			// TODO Auto-generated method stub
+			
+		}
+		
+		private void uploadDataToParse(Location location) {
+			try{
+				Log.i(TAG, "Uploading data to parse");
+				HttpClient client = new DefaultHttpClient();
+				String url = "https://api.parse.com/1/classes/trackdata";
+				HttpPost post = new HttpPost(url);
+				post.setHeader("X-Parse-Application-Id", "8gA50gSiVTZzzJwXyLbCLVYWuXvGyA4fkrhnC6OK");
+				post.setHeader("X-Parse-REST-API-Key", "RY1gi8mxESXYEUCH6J8bWza6j7xmexmJ3xYcbPCj");
+				post.setHeader("Content-Type", "application/json");
+				JSONObject obj = new JSONObject();
+				JSONObject loc = new JSONObject();
+				loc.put("__type", "GeoPoint");
+				loc.put("latitude", location.getLatitude());
+				loc.put("longitude",location.getLongitude());
+				obj.put("location", loc);
+				obj.put("uid", Common.MY_ID);
+
+				StringEntity se = new StringEntity(obj.toString());
+
+				post.setEntity(se);
+				org.apache.http.HttpResponse response = client.execute(post);
+				BufferedReader rd = new BufferedReader(new InputStreamReader(
+						response.getEntity().getContent()));
+				String line = "";
+				while ((line = rd.readLine()) != null) {
+					System.out.println(line);
+					Log.i(TAG, line);
+				}
+			}catch(Exception e) {
+				e.printStackTrace();
+			}
+		}
+
+
+		@Override
+		public void onProviderDisabled(String provider) {
+			// TODO Auto-generated method stub
+			
+		}
+
+
+		@Override
+		public void onProviderEnabled(String provider) {
+			// TODO Auto-generated method stub
+			
+		}
+	};
 }
 

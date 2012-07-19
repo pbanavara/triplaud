@@ -1,5 +1,7 @@
 package in.company.letsmeet;
 
+import in.company.letsmeet.common.Common;
+import in.company.letsmeet.common.HttpConnectionHelper;
 import in.company.letsmeet.locationutil.BestLocationFinder;
 
 import java.util.Random;
@@ -33,8 +35,8 @@ public class Main extends Activity implements OnClickListener{
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		this.context = getApplicationContext();
-		BestLocationFinder finder = new BestLocationFinder(getApplicationContext(), LocationManager.NETWORK_PROVIDER,0,false);
-		finder.getBestLocation(System.currentTimeMillis());
+		BestLocationFinder finder = new BestLocationFinder(getApplicationContext(), LocationManager.NETWORK_PROVIDER,false);
+		finder.getBestLocation(System.currentTimeMillis(),0);
 		Common.MY_ID = String.valueOf(new Random().nextInt(Integer.MAX_VALUE) +1);
 		Criteria criteria = new Criteria();
 		criteria.setPowerRequirement(Criteria.POWER_MEDIUM);
@@ -75,7 +77,7 @@ public class Main extends Activity implements OnClickListener{
 				finalObject = new JSONObject();
 				Location location = Common.getLocation();
 				JSONObject newContact = new JSONObject();
-				newContact.put("NAME", "name");
+				newContact.put("NAME", "Dummy Friend");
 				newContact.put("PHONE_NUMBER", Common.SINGLE_USER_FRIEND_ID);
 				newContact.put("LOC","");
 				JSONArray selectedContacts = new JSONArray();

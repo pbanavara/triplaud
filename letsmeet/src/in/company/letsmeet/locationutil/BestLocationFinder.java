@@ -1,6 +1,6 @@
 package in.company.letsmeet.locationutil;
 
-import in.company.letsmeet.Common;
+import in.company.letsmeet.common.Common;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -30,23 +30,25 @@ public class BestLocationFinder {
 	  protected Context context;
 	  public Location bestResult;
 	  private String provider;
-	  private long frequency;
+	 
 	  private boolean uploadFrequentUpdates;
+
+	private long frequency;
 	  
-	  public BestLocationFinder(Context context, String provider, long frequency, boolean uploadFrequent) {
+	  public BestLocationFinder(Context context, String provider, boolean uploadFrequent) {
 		  locationManager = (LocationManager)context.getSystemService(Context.LOCATION_SERVICE);
 		  criteria = new Criteria();
 		  criteria.setPowerRequirement(Criteria.POWER_LOW);
 		  criteria.setAccuracy(Criteria.ACCURACY_COARSE);
 		  this.context = context;
 		  this.provider = provider;
-		  this.frequency = frequency;
 		  this.uploadFrequentUpdates = uploadFrequent;
 	  }
 	  
-	  public void getBestLocation(long minTime) {
+	  public void getBestLocation(long minTime, long frequency) {
 		  //String provider = (locationManager.getProvider(provider)).getName();
 		     Location location = locationManager.getLastKnownLocation(provider);
+		     this.frequency = frequency;
 		      if (location != null) {
 		        long time = location.getTime();
 		        if (time < minTime) {		          
@@ -69,6 +71,7 @@ public class BestLocationFinder {
 	  
 	  public void removeLocationUpdates() {
 		  locationManager.removeUpdates(singeUpdateListener);
+		  Log.d(TAG, "Stopping location listener");
 	  }
 
 	protected LocationListener singeUpdateListener = new LocationListener() {
@@ -76,7 +79,8 @@ public class BestLocationFinder {
 		public void onLocationChanged(Location location) {
 	      Log.d(TAG, "Location Update Received: " + location.getLatitude() + "," + location.getLongitude());
 	      Common.setLocation(location);
-	      if (uploadFrequentUpdates == true) {
+	      if (frequency != 0) {
+	    	  Log.d(TAG, "Frequency is :" + frequency);
 	    	  uploadDataToParse(location);
 	      } else {
 	    	  locationManager.removeUpdates(this);

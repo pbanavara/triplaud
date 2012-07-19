@@ -1,4 +1,4 @@
-package in.company.letsmeet;
+package in.company.letsmeet.common;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;

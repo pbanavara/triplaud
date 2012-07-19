@@ -1,5 +1,8 @@
 package in.company.letsmeet;
 
+import in.company.letsmeet.common.Common;
+import in.company.letsmeet.common.HttpConnectionHelper;
+import in.company.letsmeet.common.SendSms;
 import in.company.letsmeet.locationutil.BestLocationFinder;
 
 import java.util.ArrayList;
@@ -38,8 +41,8 @@ public class ContactsListActivity extends ListActivity implements OnClickListene
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		finder = new BestLocationFinder(getApplicationContext(), LocationManager.NETWORK_PROVIDER,0,false);
-		finder.getBestLocation(System.currentTimeMillis());
+		finder = new BestLocationFinder(getApplicationContext(), LocationManager.NETWORK_PROVIDER,false);
+		finder.getBestLocation(System.currentTimeMillis(),0);
 		Cursor mCursor = getContacts();
 		startManagingCursor(mCursor);
 		values = new ArrayList<Contacts>();

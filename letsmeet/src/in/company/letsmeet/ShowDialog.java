@@ -1,5 +1,7 @@
 package in.company.letsmeet;
 
+import in.company.letsmeet.common.Common;
+import in.company.letsmeet.common.HttpConnectionHelper;
 import in.company.letsmeet.locationutil.BestLocationFinder;
 
 import org.json.JSONObject;
@@ -53,8 +55,8 @@ public class ShowDialog extends Activity{
 		public void onClick(DialogInterface dialog, int which) {
 			try{
 				//Push the current location to the back-end server as a JSON object.
-					BestLocationFinder finder = new BestLocationFinder(getApplicationContext(),LocationManager.NETWORK_PROVIDER,0,false);
-					finder.getBestLocation(System.currentTimeMillis());
+					BestLocationFinder finder = new BestLocationFinder(getApplicationContext(),LocationManager.NETWORK_PROVIDER,false);
+					finder.getBestLocation(System.currentTimeMillis(),0);
 					Location loc = Common.getLocation();
 					if (loc == null) {
 						Toast.makeText(getApplicationContext(), "Location Fix not obtained, Application closing", Toast.LENGTH_LONG).show();

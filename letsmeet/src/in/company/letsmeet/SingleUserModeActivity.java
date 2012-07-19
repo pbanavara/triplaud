@@ -1,5 +1,8 @@
 package in.company.letsmeet;
 
+import in.company.letsmeet.common.Common;
+import in.company.letsmeet.common.HttpConnectionHelper;
+
 import org.json.JSONObject;
 
 import android.app.Activity;
@@ -30,8 +33,8 @@ public class SingleUserModeActivity extends Activity {
 		Location location = Common.getLocation();
 		double lat = location.getLatitude();
 		double lng = location.getLongitude();
-		double newLat = lat + (lat * (10/ 111));
-		double tempLng = 10 * ( 1 / (110 * Math.cos(lat)));
+		double newLat = lat + (lat * (5/ 111));
+		double tempLng = 5 * ( 1 / (110 * Math.cos(lat)));
 		double newLng = lng + tempLng;
 		String newLocation = newLat + "," + newLng;
 		Log.i(TAG, "Friend location" + newLocation);
