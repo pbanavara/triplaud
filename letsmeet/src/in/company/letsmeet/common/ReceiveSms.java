@@ -45,8 +45,8 @@ public class ReceiveSms extends BroadcastReceiver {
 				String[] splitMessage = message.split(":");
 				Log.i(TAG, "ORG ID" + splitMessage[1]);
 				Common.MY_ID = splitMessage[1];
-				String myNumber = splitMessage[2];
-				String friend_id = splitMessage[3];
+				//String myNumber = splitMessage[2];
+				String friend_id = splitMessage[2];
 				Intent showDialogIntent = new Intent(context, ShowDialog.class);
 				showDialogIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 				if(contactName != null) {

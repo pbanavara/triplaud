@@ -22,22 +22,24 @@ public final class R {
         public static final int purpleicon=0x7f020004;
     }
     public static final class id {
-        public static final int button1=0x7f070009;
+        public static final int autocomplete_contacts=0x7f070001;
+        public static final int button1=0x7f07000a;
         public static final int contactsbutton=0x7f070000;
-        public static final int disableTrackButton=0x7f070007;
-        public static final int disabletrack=0x7f07000f;
-        public static final int enableTrackButton=0x7f070006;
-        public static final int enabletrack=0x7f07000e;
-        public static final int label=0x7f07000b;
-        public static final int mButtonNo=0x7f070004;
-        public static final int mButtonYes=0x7f070003;
-        public static final int mapview=0x7f070005;
-        public static final int phonecheckbox=0x7f07000c;
-        public static final int popuptext=0x7f07000a;
-        public static final int spinner1=0x7f070008;
-        public static final int textView1=0x7f070001;
-        public static final int textView2=0x7f070002;
-        public static final int webView1=0x7f07000d;
+        public static final int disableTrackButton=0x7f070008;
+        public static final int disabletrack=0x7f070010;
+        public static final int enableTrackButton=0x7f070007;
+        public static final int enabletrack=0x7f07000f;
+        public static final int label=0x7f07000c;
+        public static final int mButtonNo=0x7f070005;
+        public static final int mButtonYes=0x7f070004;
+        public static final int mapview=0x7f070006;
+        public static final int mylist=0x01010000;
+        public static final int phonecheckbox=0x7f07000d;
+        public static final int popuptext=0x7f07000b;
+        public static final int spinner1=0x7f070009;
+        public static final int textView1=0x7f070002;
+        public static final int textView2=0x7f070003;
+        public static final int webView1=0x7f07000e;
     }
     public static final class layout {
         public static final int contactslist=0x7f030000;

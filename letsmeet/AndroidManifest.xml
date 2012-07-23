@@ -35,7 +35,7 @@
             android:name=".SingleUserModeActivity">
         </activity>
         <activity
-            android:name="in.company.letsmeet.ContactsListActivity" />
+            android:name=".contacts.ContactsListActivity" />
         <activity
             android:name="in.company.letsmeet.ShowDialog" />
         <activity
