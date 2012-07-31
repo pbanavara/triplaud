@@ -22,7 +22,7 @@ import android.widget.TextView;
  */
 public class ContactsListAdapter extends ArrayAdapter<Contacts> {
 	private final Activity context;
-	private ArrayList<Contacts> contactValues;
+	private final ArrayList<Contacts> contactValues;
 	private ContactsFilter cFilter;
 	private final Object myLock = new Object();
 
@@ -30,6 +30,7 @@ public class ContactsListAdapter extends ArrayAdapter<Contacts> {
 		super(context, R.layout.contactslist, values);
 		this.context = context;
 		this.contactValues = values;
+		
 	}
 
 	public View getView(int position, View convertView, ViewGroup parent) {
@@ -77,7 +78,7 @@ public class ContactsListAdapter extends ArrayAdapter<Contacts> {
 
 			if(contactValues == null) {
 				synchronized(myLock) {
-					contactValues = new ArrayList<Contacts>(); 
+					//contactValues = new ArrayList<Contacts>(); 
 				}
 			}
 			if (constraint == null || constraint.length() == 0) {
@@ -89,8 +90,7 @@ public class ContactsListAdapter extends ArrayAdapter<Contacts> {
 					results.values = list;
 					results.count = list.size();
 				}
-			}
-			else {
+			} else {
 				String prefixString = constraint.toString().toLowerCase();
 				final ArrayList<Contacts> values = contactValues;
 				final int count = values.size();
@@ -131,7 +131,7 @@ public class ContactsListAdapter extends ArrayAdapter<Contacts> {
 				for(int i = 0; i < subItems.size(); i++) {
 					   add((Contacts) subItems.get(i));
 				}
-				notifyDataSetChanged();
+				//notifyDataSetChanged();
 			} else {
 				notifyDataSetInvalidated();
 			}

@@ -1,30 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent" >   
-   <WebView  xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/webView1"
-    android:layout_below="@id/textView1"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-	/>
+    android:layout_height="fill_parent" >
 
+    <TextView
+        android:id="@+id/wvTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="175dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+   
     <Button
-        android:id="@+id/enabletrack"
+        android:id="@+id/startCommonMap"
+        android:layout_width="75dp"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/wvTextView"
+        android:text="Yes" />
+    
+     <Button
+        android:id="@+id/stopCommonMap"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:layout_marginRight="39dp"
-        android:text="Enable tracking" />
-
-    <Button
-        android:id="@+id/disabletrack"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_marginRight="16dp"
-        android:layout_toLeftOf="@+id/enabletrack"
-        android:text="Disable tracking" />
+        android:layout_centerVertical="true"
+        android:layout_toRightOf="@+id/startCommonMap"
+        android:layout_alignBottom="@+id/wvTextView"
+        android:text="No,Dismiss reminder" />
+    
 
 </RelativeLayout>

@@ -33,7 +33,7 @@ import com.google.android.maps.OverlayItem;
  * Refer to this URL on how these are rectified.
  * http://developmentality.wordpress.com/2009/10/19/android-itemizedoverlay-arrayindexoutofboundsexception-nullpointerexception-workarounds/#comment-815
  */
-public class MapItemizedOverlay<Item> extends ItemizedOverlay<OverlayItem> {
+public class MapItemizedOverlay<Item> extends ItemizedOverlay<OverlayItem> implements DialogInterface.OnClickListener{
 	private static final String TAG = "MapItemizedOverlay";
 	private ArrayList<OverlayItem> items = new ArrayList<OverlayItem>();
 	private HttpConnectionHelper helper;
@@ -52,16 +52,12 @@ public class MapItemizedOverlay<Item> extends ItemizedOverlay<OverlayItem> {
 	public MapItemizedOverlay(Drawable defaultMarker, Context context, MapView mapView) {
 		super(boundCenterBottom(defaultMarker));
 		this.context = context;
-
-
 		// Workaround for bug that Google refuses to fix:
 		// <a href="http://osdir.com/ml/AndroidDevelopers/2009-08/msg01605.html">http://osdir.com/ml/AndroidDevelopers/2009-08/msg01605.html</a>
 		// <a href="http://code.google.com/p/android/issues/detail?id=2035">http://code.google.com/p/android/issues/detail?id=2035</a>
 		populate();
 
 	}
-
-
 
 	public MapItemizedOverlay(Drawable defaultMarker, Context context, View view) {
 		super(boundCenterBottom(defaultMarker));
@@ -79,7 +75,6 @@ public class MapItemizedOverlay<Item> extends ItemizedOverlay<OverlayItem> {
 		return items.get(i);
 	}
 
-
 	@Override
 	public int size() {
 		// TODO Auto-generated method stub
@@ -96,8 +91,9 @@ public class MapItemizedOverlay<Item> extends ItemizedOverlay<OverlayItem> {
 	public boolean onTap(int index) {
 		super.onTap(index);
 		
-		String friendMessage = "Do you like this place";
-		String orgMessage = "Confirm this location, broadcast the message and get directions";
+		String friendMessage = "Like";
+		String orgMessage = "Click yes to mark location as confirmed and get directions" + "\n" +
+				"Click No to mark the location as liked";
 		// TODO Auto-generated method stub
 		OverlayItem item = items.get(index);
 		GeoPoint point = item.getPoint();
@@ -110,53 +106,27 @@ public class MapItemizedOverlay<Item> extends ItemizedOverlay<OverlayItem> {
 			this.tappedPoint = point;
 			Log.e(TAG, "Marker tapped");
 			
-			AlertDialog.Builder dialog = new AlertDialog.Builder(context);
+			AlertDialog.Builder builder = new AlertDialog.Builder(context);
+			AlertDialog dialog = builder.create();
 			dialog.setCancelable(true);
 			title = item.getTitle();
-			dialog.setTitle(title);
+			dialog.setMessage(title);
+			dialog.setTitle("Meeting place");
+			/*
 			if (Common.isFriend() == true) {
 				dialog.setMessage(friendMessage);
 			} else {
 				dialog.setMessage(orgMessage);
 			}
+			*/
 			if (Common.isFriend() == true && Common.isConfirm() == true){
 				dialog.setMessage("Your organzier has confirmed this location. Need directions ?");
 			}
-			dialog.setPositiveButton("YES", new DialogInterface.OnClickListener(){
-				public void onClick(DialogInterface dialog, int id) {
-					try{
-						Location location = Common.getLocation();
-						if(location == null) {
-							BestLocationFinder finder = new BestLocationFinder(context, LocationManager.NETWORK_PROVIDER,false);
-							finder.getBestLocation(System.currentTimeMillis(),0);
-						}
-
-						String sourceLoc = String.valueOf(location.getLatitude()) + "," + String.valueOf(location.getLongitude());
-						String destLoc = String.valueOf(tappedPoint.getLatitudeE6() / 1E6) + "," + String.valueOf(tappedPoint.getLongitudeE6() / 1E6);	
-						Intent intent = new Intent(context,WebViewActivity.class);
-						intent.putExtra("SOURCE", sourceLoc);
-						intent.putExtra("DEST", destLoc);
-						Log.e(TAG, "Location Finalized");
-						if(Common.isFriend() == true && Common.isConfirm() == false) {
-							postMarkerData("maybe");
-						} else {
-							postMarkerData("yes");
-							context.startActivity(intent);
-						}
-						
-
-					} catch(Exception e){
-						e.printStackTrace();
-					}
-				}
-			});
-			dialog.setNegativeButton("No", new DialogInterface.OnClickListener(){
-				public void onClick(DialogInterface dialog, int id) {
-					if(Common.isFriend() == false) {
-						postMarkerData("maybe");
-					}
-				}
-			});
+			dialog.setButton(AlertDialog.BUTTON_POSITIVE,"Confirm", this);
+			if(Common.isFriend() == false) {
+				dialog.setButton(AlertDialog.BUTTON_NEUTRAL, "Like", this);
+			}
+			dialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Cancel", this);
 			dialog.show();
 			//postMarkerData("maybe");
 		return true;
@@ -187,5 +157,48 @@ public class MapItemizedOverlay<Item> extends ItemizedOverlay<OverlayItem> {
 
 	}
 
+	@Override
+	public void onClick(DialogInterface dialog, int which) {
+		// TODO Auto-generated method stub
+		switch(which) {
+			case AlertDialog.BUTTON_POSITIVE:
+				Log.i(TAG, "Confirm");
+				try{
+					Location location = Common.getLocation();
+					if(location == null) {
+						BestLocationFinder finder = new BestLocationFinder(context, LocationManager.NETWORK_PROVIDER,false);
+						finder.getBestLocation(System.currentTimeMillis(),0);
+					}
+
+					String sourceLoc = String.valueOf(location.getLatitude()) + "," + String.valueOf(location.getLongitude());
+					String destLoc = String.valueOf(tappedPoint.getLatitudeE6() / 1E6) + "," + String.valueOf(tappedPoint.getLongitudeE6() / 1E6);	
+					Intent intent = new Intent(context,WebViewActivity.class);
+					intent.putExtra("SOURCE", sourceLoc);
+					intent.putExtra("DEST", destLoc);
+					Log.e(TAG, "Location Finalized");
+					postMarkerData("yes");
+					context.startActivity(intent);
+					/*
+					if(Common.isFriend() == true && Common.isConfirm() == false) {
+						postMarkerData("maybe");
+					} else {
+						postMarkerData("yes");
+						context.startActivity(intent);
+					}
+					*/
+				} catch(Exception e){
+					e.printStackTrace();
+				}
+				break;
+			case AlertDialog.BUTTON_NEGATIVE:
+				break;
+			case AlertDialog.BUTTON_NEUTRAL:
+				Log.i(TAG, "Like");
+				postMarkerData("maybe");
+				break;
+			default:
+		}
+		
+	}
 }
 

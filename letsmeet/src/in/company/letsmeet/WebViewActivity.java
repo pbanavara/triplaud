@@ -312,6 +312,9 @@ public class WebViewActivity extends MapActivity {
 			String newLine = helper.getData(newUrl);
 			JSONObject jMapData = new JSONObject(newLine);
 			JSONArray routes = jMapData.getJSONArray("route_geometry");
+			JSONObject routeSummary = jMapData.getJSONObject("route_summary");
+			int distance = routeSummary.getInt("total_distance");
+			
 
 			for (int i=0;i<routes.length();++i) {
 				JSONArray startLocation = routes.getJSONArray(i);

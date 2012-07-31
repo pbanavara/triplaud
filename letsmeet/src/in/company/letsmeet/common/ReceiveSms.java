@@ -2,8 +2,10 @@ package in.company.letsmeet.common;
 
 import in.company.letsmeet.ShowDialog;
 import in.company.letsmeet.locationutil.BestLocationFinder;
+
+import org.json.JSONObject;
+
 import android.content.BroadcastReceiver;
-import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -24,6 +26,7 @@ public class ReceiveSms extends BroadcastReceiver {
 	 * pass the same to the dialog activity.
 	 */
 	public void onReceive(Context context, Intent intent) {
+		try {
 		// TODO Auto-generated method stub
 		BestLocationFinder finder = new BestLocationFinder(context, LocationManager.NETWORK_PROVIDER,false);
 		Common.setConfirm(false);
@@ -40,14 +43,31 @@ public class ReceiveSms extends BroadcastReceiver {
 			String senderNumber = sms[i].getOriginatingAddress();
 			String contactName = getContactName(senderNumber, context);
 			String message = sms[i].getMessageBody().toString();
-			if(message.contains("meet-me")) {
+			if(message.contains("mme")) {
 				Common.setFriend(true);
-				String[] splitMessage = message.split(":");
-				Log.i(TAG, "ORG ID" + splitMessage[1]);
-				Common.MY_ID = splitMessage[1];
+				JSONObject object = new JSONObject(message);
+				Common.MY_ID = object.getString("mme");
+				
+				//String[] splitMessage = message.split(":");
+				//Log.i(TAG, "ORG ID" + splitMessage[1]);
+				//Common.MY_ID = splitMessage[1];
 				//String myNumber = splitMessage[2];
-				String friend_id = splitMessage[2];
+				//String friend_id = splitMessage[2];
+				//String date = splitMessage[3];
+				String friend_id = object.getString("f");
+				String date = object.getString("d");
+				String destinationLocation = object.getString("l");
+				Common.setAddressLocationLatLng(destinationLocation);
+				
+				//Split the date and set the appointment date in common
 				Intent showDialogIntent = new Intent(context, ShowDialog.class);
+				
+				if (date != null) {
+					showDialogIntent.putExtra("DATE", date);
+				}
+ 				if (destinationLocation != null ) {
+ 					showDialogIntent.putExtra("DEST", destinationLocation);
+ 				}
 				showDialogIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 				if(contactName != null) {
 					showDialogIntent.putExtra("sender", contactName);
@@ -57,6 +77,9 @@ public class ReceiveSms extends BroadcastReceiver {
 				showDialogIntent.putExtra("mynumber",friend_id);
 				context.startActivity(showDialogIntent);
 			}
+		}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 	
@@ -73,16 +96,9 @@ public class ReceiveSms extends BroadcastReceiver {
 		Cursor cursor = context.getContentResolver().query(contactUri, projection, null, null, null);
 
 		if (cursor.moveToFirst()) {
-
 		    // Get values from contacts database:
 		    cName =      cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME));
-
-		    // Get photo of contactId as input stream:
-
-		       
 		    Log.i(TAG, "Started uploadcontactphoto: Contact name  = " + cName);
-		 
-
 		} else {
 		    Log.v(TAG, "Started uploadcontactphoto: Contact Not Found @ " + phoneNumber);
 		    cName = null;

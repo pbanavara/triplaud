@@ -22,13 +22,7 @@ var temp = '';
 var meAndMyFriends = [];
 var fs = require('fs');
 
-setInterval(function (temp) {
-	writeMainArrayToFile();
-	sys.log("Flushing the main array to a file");
-}, 3600000);
-
 function onRequest(request,response) {
-
 	var postData = '';
 	var pathName = url.parse(request.url).pathname;
 	var id = pathName.split("=");
@@ -68,13 +62,13 @@ function onRequest(request,response) {
 				response.write(JSON.stringify({"Message":"No objects found yet"}));
 				response.end();
 			}
-
+			
 		}
 	}
 
 }
 
-http.createServer(onRequest).listen(8888);
+http.createServer(onRequest).listen(8889);
 
 
 /*
@@ -88,45 +82,25 @@ function storeAndroidUserData(postData, userId) {
 	//sys.log("data array is" + dataArray);
 	if(dataArray !== undefined || data.MYLOCATION !== undefined) {
 		sys.debug("Post sent from organizer");
-		//Check if user has already specified the location in the FSITEMS object
-		if(organizer.FSITEMS === undefined || organizer.NOFS === undefined) {
-			var obtAv = calculateAverage(organizer);
-			if(organizer.average === undefined) {
-				organizer.average = obtAv;	
-
-
-				getFourSquareData(obtAv, function(tempp) {
-					var resp = tempp.response;
-					// The true flag is added so that only the organizer objects are pushed to the main array
-					processFourSquareData(resp, organizer, true);
-					sys.log ("Four square API called for the first organizer  Average");  
-				});
-
-			} else if(organizer.average !== obtAv) {
-				getFourSquareData(obtAv, function(tempp) {
-					var resp = tempp.response;
-					// The true flag is added so that only the organizer objects are pushed to the main array
-					processFourSquareData(resp, organizer, true);
-					sys.log ("Four square API called for a new organizer Average");
-				});
-				organizer.average = obtAv;
-			}
-			// User has specified the location, just push the organizer object into the main array.
-		} else {
-			sys.log("User has specified the location, just push the organizer object into the main array");
-			if(meAndMyFriends.length > 0) {
-				for(var i=0;i<meAndMyFriends.length;++i) {
-					if(organizer.MYID !== meAndMyFriends[i].MYID) {
-						meAndMyFriends[meAndMyFriends.length-1] = organizer;
-						sys.log("Adding organizer object to the main array " + JSON.stringify(organizer));
-					}
-				}
-			} else {
-				meAndMyFriends.push(organizer);
-				sys.log("Adding first organizer object to the main array " + JSON.stringify(organizer));
-			}
+		var obtAv = calculateAverage(organizer);
+		if(organizer.average === undefined) {
+			organizer.average = obtAv;	
+			getFourSquareData(obtAv, function(tempp) {
+				var resp = tempp.response;
+				// The true flag is added so that only the organizer objects are pushed to the main array
+				processFourSquareData(resp, organizer, true);
+				sys.log ("Four square API called for the first organizer  Average");  
+			});
+		} else if(organizer.average !== obtAv) {
+			getFourSquareData(obtAv, function(tempp) {
+				var resp = tempp.response;
+				// The true flag is added so that only the organizer objects are pushed to the main array
+				processFourSquareData(resp, organizer, true);
+				sys.log ("Four square API called for a new organizer Average");
+			});
+			organizer.average = obtAv;
 		}
-
+		
 	} else {
 		sys.log("Post sent from friends");
 		//sys.log("Global object" + JSON.stringify(meAndMyFriends));
@@ -135,7 +109,6 @@ function storeAndroidUserData(postData, userId) {
 		for(var mIn = 0;mIn < meAndMyFriends.length; ++mIn) {
 			var org = meAndMyFriends[mIn];
 			var values = org.FRIENDS;
-
 			if(org.MYID === userId) {
 				if(values != undefined) {
 					for(var i=0;i<values.length;++i) {
@@ -145,32 +118,29 @@ function storeAndroidUserData(postData, userId) {
 						}
 					}	
 				}
-				if(org.NOFS !== "yes") {
-					var frAvg = calculateAverage(org);
-					if(org.average === undefined) {
-						org.average = frAvg;	
-						getFourSquareData(frAvg, function(temp) {
-							var resp = temp.response;
-							sys.log ("Four square API called for the first Friend's Average");
-							// The true flag is added so that only the organizer objects are pushed to the main array
-							processFourSquareData(resp, org, false);
-						});
-					} else if(org.average !== frAvg) {
-						getFourSquareData(frAvg, function(temp) {
-							var resp = temp.response;
-							// The true flag is added so that only the organizer objects are pushed to the main array
-							processFourSquareData(resp, org, false);
-							sys.log ("Four square API called for a new Friend's Average" );
-							org.average = frAvg;
-
-						});
-					}
+				var frAvg = calculateAverage(org);
+				if(org.average === undefined) {
+					org.average = frAvg;	
+					getFourSquareData(frAvg, function(temp) {
+						var resp = temp.response;
+						sys.log ("Four square API called for the first Friend's Average");
+						// The true flag is added so that only the organizer objects are pushed to the main array
+						processFourSquareData(resp, org, false);
+					});
+				} else if(org.average !== frAvg) {
+					getFourSquareData(frAvg, function(temp) {
+						var resp = temp.response;
+						// The true flag is added so that only the organizer objects are pushed to the main array
+						processFourSquareData(resp, org, false);
+						sys.log ("Four square API called for a new Friend's Average" );
+						org.average = frAvg;
+						
+					});
 				}
 			}
 		}
-
 	}
-
+	
 } 
 
 /*
@@ -227,6 +197,7 @@ function calculateAverage(organizer) {
 			}
 			averageLat = aLat / (avInd);
 			averageLng = aLng / (avInd);
+			sys.log("In loop" + averageLat);
 		}
 	} else {
 		averageLat = organizerLat;
@@ -268,54 +239,54 @@ function markSelectedPoints(org, id, postData) {
  * Add organizer object to the main array meAndMyFriends if and only if the organizer doesn't exist already.
  */
 function processFourSquareData(resp, organizer, flag) {
-	if(resp !== null) {
-		var groups = resp.groups;
-		if(groups !== undefined) {	
-			var venLen = groups.length;
-			for(var fsI = 0; fsI < venLen; ++fsI ) {
-				var items = groups[fsI].items;
-				var fsObjectArray = [];
-				for(var it=0;it<items.length;++it) {
-					var fLat = items[it].venue.location.lat;	
-					var fLng = items[it].venue.location.lng;	
-					var address = items[it].venue.location.address;
-					if(address === undefined || address === null) {
-						address = "address";
-					}
-					var name = items[it].venue.name;
-					var phoneNumber = items[it].venue.contact.phone;
-					//sys.log(fLat);
-					var selected = "";
-					var fsObject = {
-							id:it,
-							name:name,
-							lat:fLat,
-							lng:fLng,
-							address:address,
-							phone:phoneNumber,
-							selected:selected
-					};
-					//sys.log("FSOBJECT" + JSON.stringify(fsObject));
-					fsObjectArray.push(fsObject);
+	var groups = resp.groups;
+	if(groups !== undefined) {	
+		var venLen = groups.length;
+		for(var fsI = 0; fsI < venLen; ++fsI ) {
+			var items = groups[fsI].items;
+			var fsObjectArray = [];
+			for(var it=0;it<items.length;++it) {
+				var fLat = items[it].venue.location.lat;	
+				var fLng = items[it].venue.location.lng;	
+				var address = items[it].venue.location.address;
+				if(address === undefined || address === null) {
+					address = "address";
 				}
-			}
-			organizer.FSITEMS = fsObjectArray;
-
-			if(flag === true) {
-				if(meAndMyFriends.length > 0) {
-					for(var i=0;i<meAndMyFriends.length;++i) {
-						if(organizer.MYID !== meAndMyFriends[i].MYID) {
-							meAndMyFriends[meAndMyFriends.length-1] = organizer;
-							sys.log("Adding organizer object to the main array " + JSON.stringify(organizer));
-						}
-					}
-				} else {
-					meAndMyFriends.push(organizer);
-					sys.log("Adding organizer object to the main array " + JSON.stringify(organizer));
-				}
+				var name = items[it].venue.name;
+				var phoneNumber = items[it].venue.contact.phone;
+				//sys.log(fLat);
+				var selected = "";
+				var fsObject = {
+						id:it,
+						name:name,
+						lat:fLat,
+						lng:fLng,
+						address:address,
+						phone:phoneNumber,
+						selected:selected
+				};
+				//sys.log("FSOBJECT" + JSON.stringify(fsObject));
+				fsObjectArray.push(fsObject);
 			}
 		}
-	} 
+		organizer.FSITEMS = fsObjectArray;
+		
+		if(flag === true) {
+			if(meAndMyFriends.length > 0) {
+				for(var i=0;i<meAndMyFriends.length;++i) {
+					if(organizer.MYID !== meAndMyFriends[i].MYID) {
+						meAndMyFriends[meAndMyFriends.length-1] = organizer;
+						sys.log("Adding organizer object to the main array " + JSON.stringify(organizer));
+					}
+				}
+			} else {
+				meAndMyFriends.push(organizer);
+				sys.log("Adding organizer object to the main array " + JSON.stringify(organizer));
+			}
+		}
+		
+
+	}
 }
 
 /*
@@ -323,16 +294,14 @@ function processFourSquareData(resp, organizer, flag) {
  */
 function writeMainArrayToFile() {
 	var date = new Date().toISOString();
-	var fileName = "mainJsonObjects";
+	var fileName = '';
 	fileName = fileName.concat(date);
-	var absoluteFileName = "/home/ec2-user/socialEyez/".concat(fileName).concat(".txt");
-	fs.writeFile(absoluteFileName, JSON.stringify(meAndMyFriends), function(err) {
-		if(err) {
-			sys.log(err);
-		} else {
-			sys.log("The file was saved!");
-			meAndMyFriends = [];
-		}
+	fs.writeFile("/tmp/test", meAndMyFriends, function(err) {
+	    if(err) {
+	        sys.log(err);
+	    } else {
+	        sys.log("The file was saved!");
+	        meAndMyFriends = [];
+	    }
 	}); 
-
 }

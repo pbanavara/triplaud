@@ -172,6 +172,15 @@ public class CommonMapActivity extends MapActivity{
 	 */
 	private class AddMapOverlays extends AsyncTask<MapView, Void, List<OverlayItem>>{
 		private static final String TAG = "AddMapOverlaysAsync";
+		private boolean running = true;
+		@Override
+		protected void onCancelled() {
+			// TODO Auto-generated method stub
+			super.onCancelled();
+			running = false;
+		}
+
+
 		@Override
 		protected void onPreExecute() {
 			// TODO Auto-generated method stub
@@ -193,7 +202,7 @@ public class CommonMapActivity extends MapActivity{
 				String obtainedLocations = connectionHelper.getData(url);
 				Log.i(TAG, "Locations obtained from backend ::::" + obtainedLocations);
 				JSONObject object = new JSONObject(obtainedLocations);
-				
+
 				String newObject = object.toString();
 				if(oldObject == null) {
 					oldObject = object.toString();
@@ -309,15 +318,17 @@ public class CommonMapActivity extends MapActivity{
 		@Override
 		protected List<OverlayItem> doInBackground(MapView... params) {
 			List<OverlayItem> points = null;
-			try {
-				for(int i = 0; i<params.length;++i) {
-					points = addMapOverlays(params[i]);
+				try {
+					for(int i = 0; i<params.length;++i) {
+						points = addMapOverlays(params[i]);
+					}
+					return points;	
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
-				return points;	
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+			
 			return points;
+
 		}
 
 

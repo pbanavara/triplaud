@@ -5,7 +5,11 @@ package in.company.letsmeet.common;
 
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Iterator;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.app.PendingIntent;
 import android.content.Context;
@@ -25,7 +29,8 @@ public class SendSms {
 	public SendSms(Context context) {
 		this.context = context;
 		Log.i(this.toString(), Common.MY_ID);
-		message = "meet-me:" + Common.MY_ID + ":";
+		message = "mme:" + Common.MY_ID + ":";
+		
 		Toast.makeText(context, "Sending SMS", Toast.LENGTH_LONG).show();
 	}
 	
@@ -40,7 +45,33 @@ public class SendSms {
 			String friend_id = name[2];
 			Log.i(this.toString(), "Contact name" + cName + "Contact Number" + phoneNumber);
 			//String newMessage = message + phoneNumber + ":" + friend_id;
-			String newMessage = message + friend_id +":http://tinyurl.com/bskh5qm";
+			Calendar sendAppointment = Common.getDestinationTime();
+			String addAppointment = null;
+			if(sendAppointment != null) {
+				int year = sendAppointment.get(Calendar.YEAR);
+				int month = sendAppointment.get(Calendar.MONTH);
+				int day = sendAppointment.get(Calendar.DAY_OF_MONTH);
+				int hour = sendAppointment.get(Calendar.HOUR);
+				int min = sendAppointment.get(Calendar.MINUTE);
+				addAppointment = new String();
+				addAppointment = addAppointment +  day + ";" + month + ";"+ year+ ";"+ hour+ ";"+ min;
+						
+			}
+			JSONObject object = new JSONObject();
+			
+			try {
+				object.put("f", friend_id);
+				object.put("mme", Common.MY_ID);
+				object.put("u", "http://tinyurl.com/bskh5qm");
+				object.put("d", addAppointment);
+				object.put("l", Common.getAddressLocationLatLng());
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			//String newMessage = message + friend_id +":http://tinyurl.com/bskh5qm" + addAppointment;
+			String newMessage = object.toString();
 			Log.d("SENDSMS", "Message to be sent" + newMessage);
 			if(phoneNumber != null && phoneNumber.length()>0) {
 				sendSms(phoneNumber, newMessage);

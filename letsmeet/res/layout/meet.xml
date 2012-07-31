@@ -4,32 +4,56 @@
     android:layout_height="fill_parent"
     android:orientation="vertical" >
 
-    <TextView
-        android:id="@+id/textView1"
+    <RadioButton
+        android:id="@+id/radioFindLocationYes"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="44dp"
-        android:text="Lets meet up for"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+        android:layout_alignParentLeft="true"
+        android:checked="true"
+        android:text="Choose a place based on friends current locations." />
 
     <Spinner
-        android:id="@+id/spinner1"
+        android:id="@+id/spinner"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/textView1"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="34dp" />
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/radioFindLocationYes"
+        android:layout_marginTop="18dp" />
+
+    <RadioButton
+        android:id="@+id/radioFindLocationNo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/spinner"
+        android:layout_marginTop="23dp"
+        
+        android:text="Enter Place and time to meet" />
 
     <Button
-        android:id="@+id/button1"
+        android:id="@+id/buttonDatePick"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/spinner1"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/radioFindLocationNo"
+        android:layout_marginTop="19dp"
+        android:text="Date/Time" />
+
+    <EditText
+        android:id="@+id/editDestinationAddress"
+        android:layout_width="238dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignTop="@+id/buttonDatePick"
+        android:inputType="textPostalAddress" />
+
+    <Button
+        android:id="@+id/buttonSelectContacts"
+        android:layout_width="150dp"
+        android:layout_height="50dp"
+        android:layout_below="@+id/buttonDatePick"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="30dp"
-        android:onClick="selectContacts"
-        android:text="Click to select your friends" />
+        android:layout_marginTop="68dp"
+        android:text="Invite friends" />
 
 </RelativeLayout>

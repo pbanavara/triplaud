@@ -8,13 +8,16 @@ import in.company.letsmeet.common.SendSms;
 import in.company.letsmeet.locationutil.BestLocationFinder;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Random;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.ContentResolver;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.location.Location;
@@ -94,6 +97,7 @@ public class ContactsListActivity extends Activity implements OnClickListener{
 			public void onTextChanged(CharSequence filterText, int start, int before,
 					int count) {
 				// TODO Auto-generated method stub
+				Log.d(TAG, "Positions :::" + start + ":" + before + ":" + count);
 				adapter.getFilter().filter(filterText, lView);
 			}
 			
@@ -176,15 +180,70 @@ public class ContactsListActivity extends Activity implements OnClickListener{
 				String newLoc = location.getLatitude() + "," + location.getLongitude();
 				finalObject.put("MYLOCATION", newLoc);
 				finalObject.put("FRIENDS", selectedContacts);
+				String restaurantType = Common.getSelectedRestaurantType();
+				finalObject.put("OCCASION", restaurantType);
+		
+				// If the user has entered the location then fill in the FSITEMS object here itself
+				String userAddress = Common.getAddressLocationName();
+				String userAddressLoc = Common.getAddressLocationLatLng();
+				if (userAddress != null && userAddressLoc != null) {
+					JSONArray fsItems = new JSONArray();
+					JSONObject indFsItem = new JSONObject();
+					indFsItem.put("name", userAddress);
+					indFsItem.put("address", userAddress);
+					indFsItem.put("id", 0);
+					String[] userAddressArr = userAddressLoc.split(",");
+					String userLocLat = userAddressArr[0];
+					String userLocLng = userAddressArr[1];
+					indFsItem.put("lat", Double.parseDouble(userLocLat));
+					indFsItem.put("lng", Double.parseDouble(userLocLng));
+					indFsItem.put("selected", "yes");
+					
+					fsItems.put(indFsItem);
+					finalObject.put("FSITEMS",fsItems);
+					finalObject.put("NOFS", "yes");
+					
+				}
+				
+				
 				Log.i("ContactsList", String.valueOf(selectedContacts.length()));
 				connectionHelper = new HttpConnectionHelper();
 				connectionHelper.postData(Common.URL + "/id=" + Common.MY_ID, finalObject);
 				SendSms sendSms = new SendSms(getApplicationContext());
 				sendSms.sendBulkSms(smsContactList);	
 				Log.i(TAG, "SMS Sent");
-				Intent mapIntent = new Intent(this, CommonMapActivity.class);
-				mapIntent.putExtra("singleusermode", false);
-				startActivity(mapIntent);
+				
+				if(Common.getAddressLocationLatLng() != null) {
+					AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+					int day = Common.getDestinationTime().get(Calendar.DATE);
+					int month = Common.getDestinationTime().get(Calendar.MONTH);
+					int year = Common.getDestinationTime().get(Calendar.YEAR);
+					int hour = Common.getDestinationTime().get(Calendar.HOUR_OF_DAY);
+					int minute = Common.getDestinationTime().get(Calendar.MINUTE);
+					StringBuffer messageBuffer = new StringBuffer();
+					messageBuffer.append("You have scheduled a meeting at\n");
+					messageBuffer.append(Common.getAddressLocationName());
+					messageBuffer.append("\n");
+					messageBuffer.append(day).append(":").append(month).append(":").append(year).append("\n");
+					messageBuffer.append(hour).append(":").append(minute).append("\n");
+					dialog.setMessage(messageBuffer.toString());
+					dialog.setTitle("SocialEyez");
+					dialog.setPositiveButton("yes", new DialogInterface.OnClickListener() {
+						
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							// TODO Auto-generated method stub
+							setResult(Common.CANCEL_ALL);
+							finish();
+						}
+					});
+					dialog.show();
+					
+				} else {
+					Intent mapIntent = new Intent(this, CommonMapActivity.class);
+					mapIntent.putExtra("singleusermode", false);
+					startActivity(mapIntent);
+				}
 
 			} catch (Exception je) {
 				je.printStackTrace();

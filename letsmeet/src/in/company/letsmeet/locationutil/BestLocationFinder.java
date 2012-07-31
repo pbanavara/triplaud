@@ -52,14 +52,14 @@ public class BestLocationFinder {
 		      if (location != null) {
 		        long time = location.getTime();
 		        if (time < minTime) {		          
-		          locationManager.requestLocationUpdates(provider, frequency, 0, singeUpdateListener, context.getMainLooper());
+		          locationManager.requestLocationUpdates(provider, frequency, 0, singeUpdateListener);
 		          Log.i(TAG, "Old update");
 		        }
 		        else if (time >= minTime) {
 		          Common.setLocation(location);
 		        }
 		      } else {
-		    	  locationManager.requestLocationUpdates(provider, frequency, 0, singeUpdateListener, context.getMainLooper());
+		    	  locationManager.requestLocationUpdates(provider, frequency, 0, singeUpdateListener);
 		    	  Log.i(TAG, "Last known location null, hence trigerring new updates");
 		      }
 		      

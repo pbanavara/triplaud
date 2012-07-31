@@ -1,5 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/TheSplashLayout"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content" >
+
+    <TextView
+        android:id="@+id/textViewMain"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="SocialEyez is a map based meeting organizer.Organizers and attendees can select the places of interest without making any phone calls.On the map, orange markers denote meeting locations. purple markers indicate liked locations and green markers indicate confirmed locations"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <Button
+        android:id="@+id/buttonSingle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textViewMain"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="79dp"
+        android:text="Try as a single user" />
+
+    <Button
+        android:id="@+id/mButtonToApp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/buttonSingle"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="54dp"
+        android:text="Take me to the application" />
+
+</RelativeLayout>
+<!--  
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical" >
@@ -39,6 +71,6 @@
         android:layout_alignLeft="@+id/mButtonYes"
         android:layout_below="@+id/mButtonYes"
         android:layout_marginTop="33dp"
-        android:text="Single user mode" />
-    
+        android:text="Single user mode" />  
 </RelativeLayout>
+-->
