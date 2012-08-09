@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="in.company.letsmeet"
+    package="in.socialeyez.letsmeet"
     android:versionCode="1"
     android:versionName="1.0" >
 
@@ -42,13 +42,13 @@
         <activity
             android:name=".contacts.ContactsListActivity" />
         <activity
-            android:name="in.company.letsmeet.ShowDialog" />
+            android:name="in.socialeyez.letsmeet.ShowDialog" />
         <activity
             android:name=".common.SendSms" />
         <activity
             android:name=".CommonMapActivity" />
         <activity
-            android:name="in.company.letsmeet.MapUs" />
+            android:name="in.socialeyez.letsmeet.MapUs" />
         <receiver android:name=".common.ReceiveSms" android:enabled="true">
 			<intent-filter>
 				<action android:name="android.provider.Telephony.SMS_RECEIVED" />
@@ -57,7 +57,7 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
 		</receiver>
-		 <receiver android:name=".alarm.AlarmReceiver" android:enabled="true">
+		 <receiver android:name = ".alarm.AlarmReceiver" android:enabled="true">
 			<intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
@@ -71,9 +71,8 @@
 		 -->
 		 <activity
             android:name=".WebViewActivity">
-        </activity>
-         <activity
-            android:name=".alarm.AlarmActivity"
+			</activity>
+        <activity android:name = ".alarm.AlarmActivity"
             android:theme="@android:style/Theme.Dialog">
         </activity>
         

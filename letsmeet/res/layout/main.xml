@@ -8,7 +8,7 @@
         android:id="@+id/textViewMain"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="SocialEyez is a map based meeting organizer.Organizers and attendees can select the places of interest without making any phone calls.On the map, orange markers denote meeting locations. purple markers indicate liked locations and green markers indicate confirmed locations"
+        android:text="LetsMeet is a map based meeting organizer.Organizers and attendees can select the places by tapping on markers on the map.Once a choice is made, the color of the particular marker changes. Purple indicates liked locations and green indicates confirmed locations. Tap on each marker for details"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <Button
@@ -17,7 +17,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/textViewMain"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="79dp"
+        android:layout_marginTop="40dp"
         android:text="Try as a single user" />
 
     <Button
@@ -26,7 +26,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/buttonSingle"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="54dp"
+        android:layout_marginTop="26dp"
         android:text="Take me to the application" />
 
 </RelativeLayout>

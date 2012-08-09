@@ -8,52 +8,60 @@
         android:id="@+id/radioFindLocationYes"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
         android:checked="true"
-        android:text="Choose a place based on friends current locations." />
+        android:text="Choose a place based on friends current location." />
 
     <Spinner
         android:id="@+id/spinner"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
         android:layout_below="@+id/radioFindLocationYes"
-        android:layout_marginTop="18dp" />
+        android:layout_marginTop="10dp" />
 
     <RadioButton
         android:id="@+id/radioFindLocationNo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
         android:layout_below="@+id/spinner"
-        android:layout_marginTop="23dp"
-        
-        android:text="Enter Place and time to meet" />
+        android:text="Enter Place/Address"
+        android:layout_marginTop="10dp" />
 
-    <Button
-        android:id="@+id/buttonDatePick"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_below="@+id/radioFindLocationNo"
-        android:layout_marginTop="19dp"
-        android:text="Date/Time" />
-
+   
     <EditText
         android:id="@+id/editDestinationAddress"
         android:layout_width="238dp"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignTop="@+id/buttonDatePick"
-        android:inputType="textPostalAddress" />
+        android:layout_below="@+id/radioFindLocationNo"
+        android:layout_marginTop="10dp"
+        android:inputType="textPostalAddress"
+        android:paddingTop="10dp" />
+
+    <CheckBox
+        android:id="@+id/dateCheck"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/editDestinationAddress"
+        android:layout_marginTop="10dp"
+        android:text="Specify a date/time if not going right now." />
+	<!-- 
+     <Button
+        android:id="@+id/buttonGoAlone"
+        android:layout_width="130dp"
+        android:layout_height="50dp"
+        android:layout_toRightOf="@+id/buttonSelectContacts"
+        android:layout_below="@+id/dateCheck"
+        android:text="Go alone" 
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="10dp"/>
+        -->
 
     <Button
         android:id="@+id/buttonSelectContacts"
-        android:layout_width="150dp"
+        android:layout_width="130dp"
         android:layout_height="50dp"
-        android:layout_below="@+id/buttonDatePick"
+        android:layout_below="@+id/dateCheck"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="68dp"
+        android:layout_marginTop="27dp"
         android:text="Invite friends" />
-
+    
 </RelativeLayout>

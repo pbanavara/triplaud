@@ -25,9 +25,9 @@ function initialize() {
   map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
   map.setCenter(bangalore);
 	});
-  //displayRoutes();
-  //directionsDisplay.setMap(map);
-  showTrafficData();
+  displayRoutes();
+  directionsDisplay.setMap(map);
+  //showTrafficData();
 }
 
 function showTrafficData() {
@@ -97,7 +97,7 @@ for (var k=0; k<latitude.length; ++k) {
     origin:gLatLonArray[0],
     destination:gLatLonArray[1],
     travelMode: google.maps.TravelMode.DRIVING,
-    provideRouteAlternatives:true
+    provideRouteAlternatives:false
   };
   var polyLine = null;
   //For the time bieng filler for color coding.
