@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+    <!--
+    <RadioButton
+        android:id="@+id/radioFindLocationYes"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:checked="true"
+        android:text="LetsMeet is a group tracking application.Invite one or more friends to a place of your choice and track them until they arrive" />
+
+    <Spinner
+        android:id="@+id/spinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/radioFindLocationYes"
+        android:layout_marginTop="10dp" />
+    -->
+
+    <TextView
+        android:id="@+id/meMeetText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:text="LetsMeet is a group tracking application.Invite one or more friends to a place of your choice and track them until they arrive"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView
+        android:id="@+id/meLocationText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/meMeetText"
+        android:text="Enter a place (for ex: Starbucks) or an address"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <EditText
+        android:id="@+id/meEditDestinationAddress"
+        android:layout_width="238dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/meLocationText"
+        android:layout_marginTop="18dp"
+        android:ems="10"
+        android:inputType="textPostalAddress" >
+
+        <requestFocus />
+    </EditText>
+
+    <CheckBox
+        android:id="@+id/meDateCheck"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/meEditDestinationAddress"
+        android:layout_marginTop="22dp"
+        android:text="Specify a date and time to setup up a future appointment" />
+
+    <Button
+        android:id="@+id/meButtonSelectContacts"
+        android:layout_width="130dp"
+        android:layout_height="50dp"
+        android:layout_below="@+id/meDateCheck"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="23dp"
+        android:text="I want to invite friends" />
+
+    <Button
+        android:id="@+id/meButtonAlone"
+        android:layout_width="130dp"
+        android:layout_height="50dp"
+        android:layout_alignLeft="@+id/meButtonSelectContacts"
+        android:layout_below="@+id/meButtonSelectContacts"
+        android:layout_marginTop="14dp"
+        android:text="I want to try the app first" />
+    <TextView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/text"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:gravity="center"
+    android:textSize="14sp"
+    android:textStyle="bold" />
+
+</RelativeLayout>

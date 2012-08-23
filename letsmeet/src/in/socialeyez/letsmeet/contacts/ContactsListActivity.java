@@ -207,10 +207,8 @@ public class ContactsListActivity extends Activity implements OnClickListener{
 				
 				Log.i("ContactsList", String.valueOf(selectedContacts.length()));
 				connectionHelper = new HttpConnectionHelper();
-				connectionHelper.postData(Common.URL + "/id=" + Common.MY_ID, finalObject);
-				
-				Log.i(TAG, "SMS Sent");
-				
+				connectionHelper.postData(Common.URL + "/id=" + Common.MY_ID, finalObject);	
+				//Check if the meeting is right away or sometime in the future.
 				if(Common.getDestinationTime() != null && Common.getAddressLocationName() != null) {
 					AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 					int day = Common.getDestinationTime().get(Calendar.DATE);
@@ -293,8 +291,6 @@ public class ContactsListActivity extends Activity implements OnClickListener{
 				Intent mapIntent = new Intent(getApplicationContext(), CommonMapActivity.class);
 				mapIntent.putExtra(Common.SINGLE_USER_MODE_FLAG, false);
 				startActivity(mapIntent);
-				Common.setAddressLocationLatLng(null);
-				Common.setAddressLocationName(null);
 				
 			}
 		});

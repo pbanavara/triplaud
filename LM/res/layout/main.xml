@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/TheSplashLayout"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content" >
+
+    <TextView
+        android:id="@+id/textViewMain"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="LetsMeet is group tracking application.It lets you search for a place on the map, invite friends to that place and with their permission lets you track them until the meeting starts. You can also use the app to just track your journeys when you are traveling alone "
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView
+        android:id="@+id/maTextLocate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textViewMain"
+        android:layout_toRightOf="@+id/maImageLocate"
+        android:text="Click on this action bar icon if you are traveling alone, want to search your address, and want to track your journey."
+        android:textAppearance="?android:attr/textAppearanceMedium" 
+        android:paddingTop="10dp"/>
+
+    <ImageView
+        android:id="@+id/maImageLocate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textViewMain"
+     	  android:paddingTop="10dp"
+        android:src="@drawable/gd_action_bar_locate_myself" />
+
+    <TextView
+        android:id="@+id/maTextFriends"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/maTextLocate"
+        android:layout_below="@+id/maTextLocate"
+        android:text="Click on this action bar icon if you want to invite your friends to a meeting place and wish to track them."
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:paddingTop="10dp" />
+
+    <ImageView
+        android:id="@+id/maImageFriends"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/maTextLocate"
+        android:src="@drawable/gd_action_bar_all_friends" 
+        android:paddingTop="10dp" />
+
+</RelativeLayout>

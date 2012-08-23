@@ -169,11 +169,12 @@ public class MapItemizedOverlay<Item> extends ItemizedOverlay<OverlayItem> imple
 				String sourceLoc = String.valueOf(location.getLatitude()) + "," + String.valueOf(location.getLongitude());
 				String destLoc = String.valueOf(tappedPoint.getLatitudeE6() / 1E6) + "," + String.valueOf(tappedPoint.getLongitudeE6() / 1E6);	
 				Intent intent = new Intent(context,WebViewActivity.class);
+				Common.setDirectionsSourceDestination(sourceLoc, destLoc);
 				intent.putExtra("SOURCE", sourceLoc);
 				intent.putExtra("DEST", destLoc);
 				Log.e(TAG, "Location Finalized");
 				postMarkerData("yes");
-				context.startActivity(intent);
+				//context.startActivity(intent);
 			} catch(Exception e){
 				e.printStackTrace();
 			}

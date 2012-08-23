@@ -16,7 +16,7 @@ import android.location.LocationManager;
  * Common class for all the required constants.
  */
 public final class Common {
-	public static final String URL = "http://ec2-122-248-211-48.ap-southeast-1.compute.amazonaws.com:8889";
+	public static final String URL = "http://ec2-122-248-211-48.ap-southeast-1.compute.amazonaws.com:8888";
 	public static String MY_ID;
 	public static final String SINGLE_USER_ID = "1111";
 	public static final String SINGLE_USER_FRIEND_ID = "55555";
@@ -106,6 +106,23 @@ public final class Common {
 	}
 
 	private static String selectedRestaurantType;
+	private static String sourceDirectionsLoc;
+	private static String destDirectionsLoc;
+
+	public static void setDirectionsSourceDestination(String sourceLoc,
+			String destLoc) {
+		// TODO Auto-generated method stub
+		Common.sourceDirectionsLoc = sourceLoc;
+		Common.destDirectionsLoc = destLoc;
+		
+	}
 	
+	public static String getDirectionsSourceLoc() {
+		return Common.sourceDirectionsLoc;
+	}
+	
+	public static String getDirectionsDestinationLoc() {
+		return Common.destDirectionsLoc;
+	}
 	
 }

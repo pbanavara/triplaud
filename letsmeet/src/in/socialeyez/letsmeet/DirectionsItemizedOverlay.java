@@ -1,5 +1,6 @@
 package in.socialeyez.letsmeet;
 
+import in.socialeyez.letsmeet.common.Common;
 import in.socialeyez.letsmeet.common.HttpConnectionHelper;
 import in.socialeyez.letsmeet.locationutil.BestLocationFinder;
 
@@ -100,8 +101,8 @@ public class DirectionsItemizedOverlay<Item> extends ItemizedOverlay<OverlayItem
 			AlertDialog.Builder dialog = new AlertDialog.Builder(context);
 			dialog.setCancelable(false);
 			title = item.getTitle();
-			dialog.setTitle(title);
-			dialog.setMessage(item.getSnippet());
+			dialog.setTitle(Common.DIALOG_TITLE);
+			dialog.setMessage(title);
 			dialog.setPositiveButton("YES", new DialogInterface.OnClickListener(){
 				public void onClick(DialogInterface dialog, int id) {
 						

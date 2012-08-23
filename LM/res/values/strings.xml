@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">LetsMeet</string>
+	<string name="google_map_api_key_debug"></string>
+    <!-- Activities labels -->
+    <string name="general_info_label">General information</string>   
+    <string name="action_bar_activity_label">ActionBarActivity</string>
+    <string name="about">About</string>
+    <string name="license">License</string>
+    
+  
+</resources>

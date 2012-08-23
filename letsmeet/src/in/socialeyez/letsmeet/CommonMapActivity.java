@@ -1,6 +1,5 @@
 package in.socialeyez.letsmeet;
 
-import in.socialeyez.letsmeet.R;
 import in.socialeyez.letsmeet.common.Common;
 import in.socialeyez.letsmeet.common.HttpConnectionHelper;
 import in.socialeyez.letsmeet.common.MyFileWriter;
@@ -8,7 +7,6 @@ import in.socialeyez.letsmeet.common.Writer;
 import in.socialeyez.letsmeet.locationutil.BestLocationFinder;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -19,6 +17,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationManager;
@@ -27,6 +26,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -55,6 +55,8 @@ public class CommonMapActivity extends MapActivity{
 
 	private String displayMessage;
 	private Writer writer;
+	
+	private Button directionsButton;
 
 	private HttpConnectionHelper connectionHelper = new HttpConnectionHelper();
 
@@ -111,9 +113,26 @@ public class CommonMapActivity extends MapActivity{
 		toCallAsynchronous(mapView);
 		displayMessage = "Please wait for your friends to respond, showing locations around you in the meanwhile";
 		Button trackYes = (Button)findViewById(R.id.enableTrackButton);
-		trackYes.setVisibility(View.INVISIBLE);
+		//trackYes.setVisibility(View.INVISIBLE);
+		trackYes.setEnabled(false);
 		Button trackNo = (Button)findViewById(R.id.disableTrackButton);
-		trackNo.setVisibility(View.INVISIBLE);
+		//trackNo.setVisibility(View.INVISIBLE);
+		trackNo.setEnabled(false);
+		directionsButton = (Button)findViewById(R.id.directionsButton);
+		directionsButton.setEnabled(false);
+		directionsButton.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(getApplicationContext(), WebViewActivity.class);
+				intent.putExtra("SOURCE", Common.getDirectionsSourceLoc());
+				intent.putExtra("DEST", Common.getDirectionsDestinationLoc());
+				startActivity(intent);
+				
+			}
+			
+		});
+		
 	}
 
 	/**
@@ -299,6 +318,7 @@ public class CommonMapActivity extends MapActivity{
 							} else if(selected.equalsIgnoreCase("yes")) {
 								fsDrawable = getApplicationContext().getResources().getDrawable(R.drawable.greenicon);
 								Common.setConfirm(true);
+								
 							} else {
 								fsDrawable = getApplicationContext().getResources().getDrawable(R.drawable.orangeicon);
 							}
@@ -307,7 +327,8 @@ public class CommonMapActivity extends MapActivity{
 							pointList.add(fsItem);	
 						}
 					} else {
-						displayMessage = "Didn't find any meeting locations";
+						//displayMessage = "Didn't find any meeting locations";
+						displayMessage = "Please wait for your friends to respond, meeting places will be displayed soon after";
 					}
 					refreshFlag = false;
 					return pointList;
@@ -354,6 +375,9 @@ public class CommonMapActivity extends MapActivity{
 					Log.i(TAG, "On post fired");
 					if(singleMode != true) {
 						Toast.makeText(getApplicationContext(), displayMessage, Toast.LENGTH_LONG).show();
+					}
+					if(Common.isConfirm()) {
+						directionsButton.setEnabled(true);
 					}
 					// The arraySize is added as an optimizer to restrict map updates
 					itemizedOverlay.clear();

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" >
+    
+	<EditText
+	    android:id="@+id/maEditDestinationAddress"
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_alignParentLeft="true"
+	    android:layout_toLeftOf="@+id/maSearchButton"
+	    android:ems="10"
+	    android:hint="Enter address or place"
+	    android:inputType="textPostalAddress" >
+	   <requestFocus />
+	  </EditText>
+        
+    <com.google.android.maps.MapView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/mapview"
+        android:layout_width="wrap_content"
+        android:layout_height="fill_parent"
+        android:layout_above="@+id/enableTrackButton"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/maEditDestinationAddress"
+        android:apiKey="0SnFAsCYe_q4CcChsvDSegqZJLX03RfEkQbonXA"
+        android:clickable="true" />
+    
+    <!--  
+
+    <Button
+        android:id="@+id/directionsButton"
+        android:layout_width="100dp"
+        android:layout_height="50dp"
+        android:layout_below="@+id/mapview"
+        android:text="Get Directions" />
+
+    <Button
+        android:id="@+id/disableTrackButton"
+        android:layout_width="100dp"
+        android:layout_height="50dp"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/mapview"
+        android:text="Disable Tracking" />
+
+    <Button
+        android:id="@+id/enableTrackButton"
+        android:layout_width="100dp"
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:text="Enable Tracking" />
+        -->
+
+    <Button
+        android:id="@+id/maSearchButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/maEditDestinationAddress"
+        android:layout_alignBottom="@+id/maEditDestinationAddress"
+        android:layout_alignParentRight="true"
+        android:text="Search" />
+   
+   
+
+</RelativeLayout>

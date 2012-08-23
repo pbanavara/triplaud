@@ -42,7 +42,7 @@ public class Main extends Activity implements OnClickListener {
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		//Zubhium real time crash reporting
-		sdk = ZubhiumSDK.getZubhiumSDKInstance(getApplicationContext(),"cda910da3f6cd0b96a83fe56a4f55d");
+		//sdk = ZubhiumSDK.getZubhiumSDKInstance(getApplicationContext(),"cda910da3f6cd0b96a83fe56a4f55d");
 		super.onCreate(savedInstanceState);
 		this.context = getApplicationContext();
 

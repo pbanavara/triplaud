@@ -2,26 +2,37 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent" >
-   	<com.google.android.maps.MapView
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/mapview"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:clickable="true"
-    android:apiKey="0SnFAsCYe_q4CcChsvDSegqZJLX03RfEkQbonXA"
-/>
+
+    <com.google.android.maps.MapView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/mapview"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_above="@+id/enableTrackButton"
+        android:apiKey="0SnFAsCYe_q4CcChsvDSegqZJLX03RfEkQbonXA"
+        android:clickable="true" />
+
+    <Button
+        android:id="@+id/directionsButton"
+        android:layout_width="100dp"
+        android:layout_height="50dp"
+        android:layout_below="@+id/mapview"
+        android:text="Directions" />
+
+    <Button
+        android:id="@+id/disableTrackButton"
+        android:layout_width="100dp"
+        android:layout_height="50dp"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/mapview"
+        android:text="Disable Tracking" />
+
     <Button
         android:id="@+id/enableTrackButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="false"     
+        android:layout_width="100dp"
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
         android:text="Enable Tracking" />
-    
-     <Button
-        android:id="@+id/disableTrackButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"     
-        android:text="Disable Tracking" />
 
 </RelativeLayout>
