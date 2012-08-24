@@ -212,11 +212,11 @@ public class SearchMapOverlay extends com.google.android.maps.Overlay implements
 					}
 				}
 			}
-			showAlertDialog(messageBuffer.toString());
+			showConfirmDialog(messageBuffer.toString());
 		}
 	};
 
-	public void showAlertDialog(String message) {
+	public void showConfirmDialog(String message) {
 
 		AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
 		AlertDialog dialog = dialogBuilder.create();

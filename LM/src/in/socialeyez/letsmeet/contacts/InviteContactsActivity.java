@@ -4,19 +4,23 @@ import greendroid.app.ActionBarActivity;
 import greendroid.app.GDActivity;
 import greendroid.widget.ActionBarItem;
 import greendroid.widget.ActionBarItem.Type;
+import in.socialeyez.letsmeet.CommonMapActivity;
 import in.socialeyez.letsmeet.Main;
 import in.socialeyez.letsmeet.R;
 import in.socialeyez.letsmeet.SearchMapActivity;
 import in.socialeyez.letsmeet.common.Common;
 import in.socialeyez.letsmeet.common.HttpConnectionHelper;
+import in.socialeyez.letsmeet.common.SendSms;
 import in.socialeyez.letsmeet.locationutil.BestLocationFinder;
 
 import java.util.ArrayList;
 import java.util.Random;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.app.Dialog;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.Cursor;
@@ -31,7 +35,6 @@ import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
-import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -50,7 +53,8 @@ public class InviteContactsActivity extends GDActivity implements OnClickListene
 	BestLocationFinder finder;
 	private Location location ;
 	private ArrayList<String> smsContactList;
-
+	private JSONObject finalObject = null;
+	private JSONArray selectedContacts = null;
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		//Hide the title bar
@@ -114,6 +118,8 @@ public class InviteContactsActivity extends GDActivity implements OnClickListene
 
 		Button cButton = (Button)findViewById(R.id.contactsbutton);
 		cButton.setOnClickListener(this);
+		Button exploreButton = (Button)findViewById(R.id.fsbutton);
+		exploreButton.setOnClickListener(this);
 
 	}
 	/**
@@ -163,35 +169,34 @@ public class InviteContactsActivity extends GDActivity implements OnClickListene
 	 */
 	@Override
 	public void onClick(View v) {
+		
+		try {
+			smsContactList = new ArrayList<String>();
+			selectedContacts = new JSONArray();
+			for(int i=0;i<values.size();++i) {
+				Contacts contact = values.get(i);
+				if(contact.isSelected()) {
+					String name = contact.getName();
+					String id = contact.getId();
+					String phoneNumber = getPhoneNumberForContact(id);
+					String friend_id = String.valueOf(new Random().nextInt(Integer.MAX_VALUE) +1);
+					String smsContact = name + "," + phoneNumber + ","  + friend_id;
+					smsContactList.add(smsContact);
+					JSONObject newContact = new JSONObject();
+					newContact.put("NAME", contact.getName());
+					newContact.put("PHONE_NUMBER", friend_id);
+					newContact.put("LOC", "");
+					selectedContacts.put(newContact);
+				}
+			}	
+			finalObject = new JSONObject();
+			finalObject.put("MYID", Common.MY_ID);
+			location = Common.getLocation();
+			String newLoc = location.getLatitude() + "," + location.getLongitude();
+			finalObject.put("MYLOCATION", newLoc);
+			finalObject.put("FRIENDS", selectedContacts);
 		if(v.getId() == R.id.contactsbutton) {
-			try {
-				smsContactList = new ArrayList<String>();
-				JSONArray selectedContacts = new JSONArray();
-				for(int i=0;i<values.size();++i) {
-					Contacts contact = values.get(i);
-					if(contact.isSelected()) {
-						String name = contact.getName();
-						String id = contact.getId();
-						String phoneNumber = getPhoneNumberForContact(id);
-						String friend_id = String.valueOf(new Random().nextInt(Integer.MAX_VALUE) +1);
-						String smsContact = name + "," + phoneNumber + ","  + friend_id;
-						smsContactList.add(smsContact);
-						JSONObject newContact = new JSONObject();
-						newContact.put("NAME", contact.getName());
-						newContact.put("PHONE_NUMBER", friend_id);
-						newContact.put("LOC", "");
-						selectedContacts.put(newContact);
-					}
-				}	
-				JSONObject finalObject = new JSONObject();
-				finalObject.put("MYID", Common.MY_ID);
-				location = Common.getLocation();
-				String newLoc = location.getLatitude() + "," + location.getLongitude();
-				finalObject.put("MYLOCATION", newLoc);
-				finalObject.put("FRIENDS", selectedContacts);
-				String restaurantType = Common.getSelectedRestaurantType();
-				finalObject.put("OCCASION", restaurantType);
-
+			
 				// If the user has entered the location then fill in the FSITEMS object here itself
 				String userAddress = Common.getAddressLocationName();
 				String userAddressLoc = Common.getAddressLocationLatLng();
@@ -219,16 +224,53 @@ public class InviteContactsActivity extends GDActivity implements OnClickListene
 				mapIntent.putExtra(ActionBarActivity.GD_ACTION_BAR_TITLE, "Search meeting place");
 				mapIntent.putStringArrayListExtra("CONTACTS", smsContactList);
 				mapIntent.putExtra("OBJECT", finalObject.toString());
-				
 				startActivity(mapIntent);
-
-			} catch (Exception je) {
-				je.printStackTrace();
-			}
-
+		
+		//Location choices from foursquare
+		} else if ( v.getId() == R.id.fsbutton) {
+			showLocationChooserDialog();
+			//Open CommonMapActivity
+			
+		}
+		} catch (Exception je) {
+			je.printStackTrace();
 		}
 	}
-
+	
+	
+	private void showLocationChooserDialog() {
+		final Dialog dialog = new Dialog(this, android.R.style.Theme_Dialog);
+		dialog.setContentView(R.layout.chooseoccasion);
+		dialog.setTitle(Common.DIALOG_TITLE);
+		dialog.setCancelable(true);
+		Button dialogButton = (Button) dialog.findViewById(R.id.chButtonYes);
+		// if button is clicked, close the custom dialog
+		dialogButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Common.setSelectedRestaurantType("coffee");
+				String locationChoice = Common.getSelectedRestaurantType();
+				try {
+					finalObject.put("OCCASION", locationChoice);
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				connectionHelper = new HttpConnectionHelper();
+				connectionHelper.postData(Common.URL + "/id=" + Common.MY_ID, finalObject);	
+				SendSms sendSms = new SendSms(getApplicationContext());
+				sendSms.sendBulkSms(smsContactList);
+				Intent commonMapIntent = new Intent(InviteContactsActivity.this, CommonMapActivity.class);
+				commonMapIntent.putExtra(ActionBarActivity.GD_ACTION_BAR_TITLE, "Group center point");
+				commonMapIntent.putExtra("FS", "yes");
+				startActivity(commonMapIntent);
+				dialog.dismiss();
+			}
+		});
+		dialog.show();
+		
+		
+	}
 	@Override
 	public boolean onHandleActionBarItemClick(ActionBarItem item, int position) {
 		Intent intent;

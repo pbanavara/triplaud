@@ -48,6 +48,7 @@ public class CommonMapActivity extends GDMapActivity{
 	private Drawable fsDrawable;
 	private MapView mapView;
 	private MapItemizedOverlay<?> itemizedOverlay;
+	//private FourSquareItemizedOverlay<?> fsItemizedOverlay;
 	private List<Overlay> mapOverlays;
 	private Timer timer;
 	private TimerTask doAsynchronousTask;
@@ -103,7 +104,13 @@ public class CommonMapActivity extends GDMapActivity{
 		//setContentView(R.layout.mapus);
 		mapView = (MapView) findViewById(R.id.mapview);
 		mapView.invalidate();
-		itemizedOverlay = new MapItemizedOverlay<Object>(drawable, this, mapView);
+		
+		//If there is a need to pull foursquare locations then use a different overlay
+		if(getIntent().getExtras().get("FS") != null) {
+			itemizedOverlay = new FourSquareItemizedOverlay<Object>(drawable, this, mapView);
+		} else {
+			itemizedOverlay = new MapItemizedOverlay<Object>(drawable, this, mapView);
+		}
 		mapOverlays = mapView.getOverlays();
 		mapControl = mapView.getController();
 		mapControl.setZoom(15);
@@ -143,7 +150,6 @@ public class CommonMapActivity extends GDMapActivity{
 				intent.putExtra(ActionBarActivity.GD_ACTION_BAR_TITLE, "Group directions");
 				intent.putExtra("DEST", dest);
 				startActivity(intent);
-
 			}
 
 		});

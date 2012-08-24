@@ -1,5 +1,6 @@
 package in.socialeyez.letsmeet;
 
+
 import greendroid.app.ActionBarActivity;
 import in.socialeyez.letsmeet.common.Common;
 import in.socialeyez.letsmeet.common.HttpConnectionHelper;
@@ -18,7 +19,6 @@ import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationManager;
 import android.util.Log;
-import android.view.View;
 
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.ItemizedOverlay;
@@ -33,7 +33,7 @@ import com.google.android.maps.OverlayItem;
  * Refer to this URL on how these are rectified.
  * http://developmentality.wordpress.com/2009/10/19/android-itemizedoverlay-arrayindexoutofboundsexception-nullpointerexception-workarounds/#comment-815
  */
-public class MapItemizedOverlay<Item> extends ItemizedOverlay<OverlayItem> implements DialogInterface.OnClickListener{
+public class FourSquareItemizedOverlay<Item> extends MapItemizedOverlay<Item> implements DialogInterface.OnClickListener{
 	private static final String TAG = "MapItemizedOverlay";
 	private ArrayList<OverlayItem> items = new ArrayList<OverlayItem>();
 	private HttpConnectionHelper helper;
@@ -44,12 +44,12 @@ public class MapItemizedOverlay<Item> extends ItemizedOverlay<OverlayItem> imple
 	private String markerId;
 
 
-	public MapItemizedOverlay(Drawable defaultMarker) {
+	public FourSquareItemizedOverlay(Drawable defaultMarker) {
 		super(boundCenterBottom(defaultMarker));
 		// TODO Auto-generated constructor stub
 	}
 
-	public MapItemizedOverlay(Drawable defaultMarker, Context context, MapView mapView) {
+	public FourSquareItemizedOverlay(Drawable defaultMarker, Context context, MapView mapView) {
 		super(boundCenterBottom(defaultMarker));
 		this.context = context;
 		// Workaround for bug that Google refuses to fix:
@@ -58,17 +58,7 @@ public class MapItemizedOverlay<Item> extends ItemizedOverlay<OverlayItem> imple
 		populate();
 
 	}
-
-	public MapItemizedOverlay(Drawable defaultMarker, Context context, View view) {
-		super(boundCenterBottom(defaultMarker));
-		this.context = context;
-		// Workaround for bug that Google refuses to fix:
-		// <a href="http://osdir.com/ml/AndroidDevelopers/2009-08/msg01605.html">http://osdir.com/ml/AndroidDevelopers/2009-08/msg01605.html</a>
-		// <a href="http://code.google.com/p/android/issues/detail?id=2035">http://code.google.com/p/android/issues/detail?id=2035</a>
-		populate();
-
-	}
-
+	
 	@Override
 	protected OverlayItem createItem(int i) {
 		// TODO Auto-generated method stub
@@ -89,8 +79,6 @@ public class MapItemizedOverlay<Item> extends ItemizedOverlay<OverlayItem> imple
 
 	@Override
 	public boolean onTap(int index) {
-		super.onTap(index);
-
 		OverlayItem item = items.get(index);
 		GeoPoint point = item.getPoint();
 		String message = item.getSnippet();
@@ -101,38 +89,35 @@ public class MapItemizedOverlay<Item> extends ItemizedOverlay<OverlayItem> imple
 		}
 		this.tappedPoint = point;
 		Log.e(TAG, "Marker tapped");
-
 		AlertDialog.Builder builder = new AlertDialog.Builder(context);
 		AlertDialog dialog = builder.create();
 		dialog.setCancelable(true);
 		title = item.getTitle();
 		dialog.setMessage(title);
 		dialog.setTitle("Meeting place");
-		dialog.setMessage(title);
-		dialog.setButton(AlertDialog.BUTTON_POSITIVE,"OK", this);
-		//dialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Cancel", this);
-		dialog.show();
-		/*
 		if (Common.isFriend() == true && Common.isConfirm() == true){
 			dialog.setMessage("Your organzier has confirmed this location. Need directions ?");
 			dialog.setButton(AlertDialog.BUTTON_POSITIVE,"Yes", this);
 			dialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Cancel", this);
 			dialog.show();
+			//return super.onTap(index);
+			return true;
 		}
 		if(Common.isFriend() == false) {
 			dialog.setButton(AlertDialog.BUTTON_POSITIVE,"Confirm", this);
 			dialog.setButton(AlertDialog.BUTTON_NEUTRAL, "Like", this);
 			dialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Cancel", this);
 			dialog.show();
+			//return super.onTap(index);
 			return true;
 		} else {
 			dialog.setButton(AlertDialog.BUTTON_NEUTRAL, "Like", this);
 			dialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Cancel", this);
 			dialog.show();
+			//return super.onTap(index);
 			return true;
 		}
-		 */
-		return true;
+		
 
 	}
 
@@ -177,7 +162,7 @@ public class MapItemizedOverlay<Item> extends ItemizedOverlay<OverlayItem> imple
 				String sourceLoc = String.valueOf(location.getLatitude()) + "," + String.valueOf(location.getLongitude());
 				String destLoc = String.valueOf(tappedPoint.getLatitudeE6() / 1E6) + "," + String.valueOf(tappedPoint.getLongitudeE6() / 1E6);	
 				Intent intent = new Intent(context,WebViewActivity.class);
-				intent.putExtra(ActionBarActivity.GD_ACTION_BAR_TITLE, "Directions");
+				intent.putExtra(ActionBarActivity.GD_ACTION_BAR_TITLE, "Group Directions");
 				Common.setDirectionsSourceDestination(sourceLoc, destLoc);
 				intent.putExtra("SOURCE", sourceLoc);
 				intent.putExtra("DEST", destLoc);

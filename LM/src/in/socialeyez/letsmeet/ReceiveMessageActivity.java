@@ -40,7 +40,7 @@ public class ReceiveMessageActivity extends GDActivity implements DialogInterfac
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-
+		setTitle("Receive Message");
 		// TODO Auto-generated method stub
 		sender = getIntent().getExtras().getString("sender");
 		myNumber = getIntent().getExtras().getString("mynumber");
@@ -103,52 +103,52 @@ public class ReceiveMessageActivity extends GDActivity implements DialogInterfac
 	public void onClick(DialogInterface dialog, int which) {
 		// TODO Auto-generated method stub
 		if(which == AlertDialog.BUTTON_POSITIVE) {
-			
 			try{
 				Common.setAddressLocationLatLng(destinationLocation);
-				//If there is no reminder then carry on as usual
-				if(null == date) {
-					//Push the current location to the back-end server as a JSON object.
+				BestLocationFinder finder = new BestLocationFinder(getApplicationContext(),LocationManager.NETWORK_PROVIDER,false);
+				finder.getBestLocation(System.currentTimeMillis(),0);
+				Location loc = Common.getLocation();
+				if (loc == null) {
+					Toast.makeText(getApplicationContext(), "Location Fix not obtained, Application closing", Toast.LENGTH_LONG).show();
+					finish();
+				}
+				String locString = String.valueOf(loc.getLatitude()) + "," + String.valueOf(loc.getLongitude());
+				connectionHelper = new HttpConnectionHelper();
+				JSONObject obj = new JSONObject();
+				obj.put("id", myNumber);
+				obj.put("loc", locString);
+				if(null != destinationLocation) {
 					Common.setAddressLocationLatLng(destinationLocation);
-					BestLocationFinder finder = new BestLocationFinder(getApplicationContext(),LocationManager.NETWORK_PROVIDER,false);
-					finder.getBestLocation(System.currentTimeMillis(),0);
-					Location loc = Common.getLocation();
-					if (loc == null) {
-						Toast.makeText(getApplicationContext(), "Location Fix not obtained, Application closing", Toast.LENGTH_LONG).show();
+					//If there is no reminder then carry on as usual
+					if(null == date) {
+						//Push the current location to the back-end server as a JSON object.
+						//String locString = "12.981596" + "," + "77.628913";
+						connectionHelper.postData(Common.URL + "/id=" + Common.MY_ID, obj);
+						Intent mapIntent = new Intent(getApplicationContext(), CommonMapActivity.class);
+						mapIntent.putExtra("singleusermode", false);
+						mapIntent.putExtra(ActionBarActivity.GD_ACTION_BAR_TITLE, "Group locations");
+						startActivity(mapIntent);
+						//If there is a reminder (date != null) then setup the alarmreceiver
+					} else {
+						Calendar c = Calendar.getInstance(Locale.getDefault());
+						c.set(Calendar.MINUTE, min);
+						c.set(Calendar.HOUR, hour);
+						c.set(Calendar.DAY_OF_MONTH, day);
+						c.set(Calendar.MONTH, month);
+						c.set(Calendar.YEAR, year);
+						Common.setDestinationTime(c);
+						SetAlarm.setRepeatingAlarm(getApplicationContext(), myNumber);
+						setResult(Common.CANCEL_ALL);
 						finish();
 					}
-					String locString = String.valueOf(loc.getLatitude()) + "," + String.valueOf(loc.getLongitude());
-					//String locString = "12.981596" + "," + "77.628913";
-					connectionHelper = new HttpConnectionHelper();
-					JSONObject obj = new JSONObject();
-					obj.put("id", myNumber);
-					obj.put("loc", locString);
+					//Fours
+				} else {
 					connectionHelper.postData(Common.URL + "/id=" + Common.MY_ID, obj);
 					Intent mapIntent = new Intent(getApplicationContext(), CommonMapActivity.class);
 					mapIntent.putExtra("singleusermode", false);
-					mapIntent.putExtra(ActionBarActivity.GD_ACTION_BAR_TITLE, "Group locations");
+					mapIntent.putExtra(ActionBarActivity.GD_ACTION_BAR_TITLE, "Group center point");
+					mapIntent.putExtra("FS","yes");
 					startActivity(mapIntent);
-					//If there is a reminder (date != null) then setup the alarmreceiver
-				} else {
-					Calendar c = Calendar.getInstance(Locale.getDefault());
-					c.set(Calendar.MINUTE, min);
-					c.set(Calendar.HOUR, hour);
-					c.set(Calendar.DAY_OF_MONTH, day);
-					c.set(Calendar.MONTH, month);
-					c.set(Calendar.YEAR, year);
-					Common.setDestinationTime(c);
-					// Set the common date as well.
-					/*
-					Intent intent = new Intent(this, AlarmReceiver.class);
-					PendingIntent pIntent = PendingIntent.getBroadcast(getApplicationContext(), 11111, intent, PendingIntent.FLAG_CANCEL_CURRENT);
-					AlarmManager manager = (AlarmManager) getSystemService(ALARM_SERVICE);
-					long frequency = Common.AlARM_INTERVAL;
-					manager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), frequency, pIntent);
-					 */
-					SetAlarm.setRepeatingAlarm(getApplicationContext(), myNumber);
-					setResult(Common.CANCEL_ALL);
-					finish();
-
 				}
 
 			} catch(Exception e){

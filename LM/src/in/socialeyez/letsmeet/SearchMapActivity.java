@@ -216,7 +216,6 @@ public class SearchMapActivity extends GDMapActivity implements OnClickListener 
 		default:
 			return super.onHandleActionBarItemClick(item, position);
 		}
-
 		return true;
 	}
 	

@@ -28,13 +28,22 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:orientation="horizontal" >
-
-        <Button
-            android:id="@+id/contactsbutton"
-            android:layout_width="150dp"
+        
+         <Button
+            android:id="@+id/fsbutton"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:text="Open Map" />
+            android:layout_toRightOf="@+id/contactsButton"
+            android:text="Location recommendation" />
+
+         <Button
+             android:id="@+id/contactsbutton"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:layout_alignBaseline="@+id/fsbutton"
+             android:layout_alignBottom="@+id/fsbutton"
+             android:layout_toRightOf="@+id/fsbutton"
+             android:text="Location search" />
 
     </RelativeLayout>
 </RelativeLayout>
