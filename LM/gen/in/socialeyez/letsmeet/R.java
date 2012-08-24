@@ -858,7 +858,9 @@ containing a value of this type.
          */
         public static final int general_info_label=0x7f09001e;
         public static final int google_map_api_key_debug=0x7f09001d;
+        public static final int lcmessage=0x7f090023;
         public static final int license=0x7f090021;
+        public static final int mainmessage=0x7f090022;
     }
     public static final class style {
         public static final int GreenDroid=0x7f0a0006;

@@ -39,6 +39,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.RadioButton;
 
 
 /**
@@ -248,7 +249,17 @@ public class InviteContactsActivity extends GDActivity implements OnClickListene
 		dialogButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Common.setSelectedRestaurantType("coffee");
+				RadioButton coffeeButton = (RadioButton) dialog.findViewById(R.id.chRadioCoffee);
+				RadioButton restaurantButton = (RadioButton) dialog.findViewById(R.id.chRadioCoffee);
+				RadioButton barButton = (RadioButton) dialog.findViewById(R.id.chRadioCoffee);
+				if(coffeeButton.isChecked()) {
+					Common.setSelectedRestaurantType("cafe");
+				} else if (restaurantButton.isChecked()) {
+					Common.setSelectedRestaurantType("restaurant");
+				} else if(barButton.isChecked()) {
+					Common.setSelectedRestaurantType("bar");
+				}
+				
 				String locationChoice = Common.getSelectedRestaurantType();
 				try {
 					finalObject.put("OCCASION", locationChoice);
