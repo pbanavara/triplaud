@@ -24,7 +24,7 @@ import com.google.android.maps.OverlayItem;
  * http://developmentality.wordpress.com/2009/10/19/android-itemizedoverlay-arrayindexoutofboundsexception-nullpointerexception-workarounds/#comment-815
  */
 public class DirectionsItemizedOverlay<Item> extends ItemizedOverlay<OverlayItem> {
-	private static final String TAG = "MapItemizedOverlay";
+	private static final String TAG = "DirectionsItemizedOverlay";
 	private ArrayList<OverlayItem> items = new ArrayList<OverlayItem>();
 
 	private Context context;
@@ -73,9 +73,11 @@ public class DirectionsItemizedOverlay<Item> extends ItemizedOverlay<OverlayItem
 	}
 
 	public void addOverlay(OverlayItem overlay) {
+		Log.i(TAG, "Overlay called");
 		items.add(overlay);
 		setLastFocusedIndex(-1);
 		populate();
+		
 	}
 
 	@Override

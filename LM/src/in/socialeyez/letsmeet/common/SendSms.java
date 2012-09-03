@@ -28,7 +28,7 @@ public class SendSms {
 	public SendSms(Context context) {
 		this.context = context;
 //		Log.i(this.toString(), Common.MY_ID);
-		//message = "mme:" + Common.MY_ID + ":";
+		//jjjjjjjjjjjjjjjjjjjjjjjjjjjmessage = "mme:" + Common.MY_ID + ":";
 		Toast.makeText(context, "Sending SMS", Toast.LENGTH_LONG).show();
 	}
 
@@ -50,7 +50,7 @@ public class SendSms {
 					JSONObject object = new JSONObject();
 					object.put("f", friend_id);
 					object.put("mme", Common.MY_ID);
-					object.put("u", "http://tinyurl.com/bskh5qm");
+					//object.put("u", "http://tinyurl.com/bskh5qm");
 					object.put("l", Common.getAddressLocationLatLng());
 					if(sendAppointment != null) {
 						int year = sendAppointment.get(Calendar.YEAR);

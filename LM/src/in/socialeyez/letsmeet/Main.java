@@ -22,6 +22,7 @@ public class Main extends GDActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		//Clear and initialize all previous values
 		Common.MY_ID = String.valueOf(new Random().nextInt(Integer.MAX_VALUE) +1);
+		Common.ORGANIZER_ID = new String(Common.MY_ID);
 		Common.setDestinationTime(null);
 		Common.setAddressLocationLatLng(null);
 		Common.setAddressLocationName(null);

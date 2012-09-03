@@ -12,11 +12,14 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -33,17 +36,19 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -62,7 +67,9 @@ public class WebViewActivity extends GDMapActivity implements OnClickListener{
 	private static final String TAG = "WebViewActivity";
 	private MapView mView;
 	private LocationManager locationManager;
-	DirectionsItemizedOverlay<OverlayItem> sOverlay;
+	private Timer parseTimer;
+	private TimerTask parseTimerTask;
+	DirectionsItemizedOverlay<OverlayItem> sItemizedOverlay;
 
 
 	@Override
@@ -79,9 +86,9 @@ public class WebViewActivity extends GDMapActivity implements OnClickListener{
 			//End GreenDroid
 
 			mView = (MapView) findViewById(R.id.mapview);
-			List<Overlay> mOverlay = mView.getOverlays();
+			final List<Overlay> mOverlay = mView.getOverlays();
 			MapController controller = mView.getController();
-		
+
 			final String destinationLoc = getIntent().getExtras().getString("DEST");
 
 			/*
@@ -99,17 +106,17 @@ public class WebViewActivity extends GDMapActivity implements OnClickListener{
 			/*
 			 * Obtain the map overlays and add the source and destination markers to those overlays.
 			 */
-			sOverlay = new DirectionsItemizedOverlay<OverlayItem>(sDrawable, this, mView);
-			DirectionsItemizedOverlay<OverlayItem> dOverlay = new DirectionsItemizedOverlay<OverlayItem>(dDrawable, this, mView);
-			dOverlay.addOverlay(dItem);
-			mOverlay.add(sOverlay);
-			mOverlay.add(dOverlay);
+			sItemizedOverlay = new DirectionsItemizedOverlay<OverlayItem>(sDrawable, this, mView);
+			DirectionsItemizedOverlay<OverlayItem> dItemizedOverlay = new DirectionsItemizedOverlay<OverlayItem>(dDrawable, this, mView);
+			dItemizedOverlay.addOverlay(dItem);
+			mOverlay.add(sItemizedOverlay);
+			mOverlay.add(dItemizedOverlay);
 			controller.setZoom(15);
 			mView.setBuiltInZoomControls(true);
-			
+
 			final List<Overlay> newOverlay = mView.getOverlays();
-			
-			new Thread( new Runnable() {
+
+			new Handler().post(new Runnable() {
 				public void run() {
 					int color = 999;
 					/*
@@ -117,137 +124,258 @@ public class WebViewActivity extends GDMapActivity implements OnClickListener{
 					 */				
 					HashMap<String, TrackerPoint> map = new HashMap<String, TrackerPoint>();
 					map.putAll(Common.friendMap);
-				
+
 					Collection<TrackerPoint> values = (Collection<TrackerPoint>) map.values();
 					Iterator<TrackerPoint> iterator = values.iterator();
 					while(iterator.hasNext()) {
 						TrackerPoint tPoint = iterator.next();
 						GeoPoint point = tPoint.getInitialPoint();
 						OverlayItem nsItem = new OverlayItem(point, tPoint.getName(), "");
-						sOverlay.addOverlay(nsItem);
+						sItemizedOverlay.addOverlay(nsItem);
 						double lat = point.getLatitudeE6() / 1e6;
 						double lng = point.getLongitudeE6() / 1e6;
 						String friendLoc = lat + "," + lng;
 						Log.i(TAG, "Destination location" + destinationLoc);
-						displayRouteFromLeafLet(friendLoc, destinationLoc, newOverlay, color);
+						displayRouteFromLeafLet(friendLoc, destinationLoc, mOverlay, color);
 						color = color - 50;
 					}
-					
+
 				}
-			}).start();
-			
+			});
+
+			//Initialize the timer task for getting directions.
+			parseTimerTask = new ParseTimerTask();
+			//Check if the timer is started in the onclick by checking for null. If the timer has been initialized, that is it's not null,
+			// Then schedule the timer task.
+			if (parseTimer != null) {
+				parseTimer.schedule(parseTimerTask,0,Common.UPDATE_MAP_FREQUENCY);
+			}
+
 			Toast.makeText(getApplicationContext(), "Please wait for directions",Toast.LENGTH_LONG).show();
+
+
+			/*
+			 * Tracking each other on the map
+			 */
+			Button trackYes = (Button)findViewById(R.id.enableTrackButton);
+			trackYes.setEnabled(true);
+			Button trackNo = (Button)findViewById(R.id.disableTrackButton);
+			trackNo.setEnabled(true);
+			locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
+			trackYes.setOnClickListener(this);
+			trackNo.setOnClickListener(this);
+
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
 
-		/*
-		 * Tracking each other on the map
-		 */
-		Button trackYes = (Button)findViewById(R.id.enableTrackButton);
-		trackYes.setEnabled(true);
-		Button trackNo = (Button)findViewById(R.id.disableTrackButton);
-		trackNo.setEnabled(true);
-		locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-		
-		trackYes.setOnClickListener(this);
-		trackNo.setOnClickListener(this);
-		
-		
+
+	}
+
+	private class ParseTimerTask extends TimerTask {
+		Handler handler = new Handler();
+		@Override
+
+		public void run() {
+			handler.post(new Runnable() {
+				public void run() {
+					try {
+						new DisplayParseData().execute(Common.friendMap);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			});
+
+		}
+
+
+	}
+
+	@Override
+	public void onConfigurationChanged(Configuration newConfig) {
+		// TODO Auto-generated method stub
+		super.onConfigurationChanged(newConfig);
+		HashMap<String, TrackerPoint> ids = new HashMap<String, TrackerPoint>(Common.friendMap);
+		Set<String> idSet = ids.keySet();
+		Iterator<String> iterator = idSet.iterator();
+		while(iterator.hasNext()) {
+			String id = iterator.next();
+			GeoPoint currentPoint = ids.get(id).getCurrentPoint();
+			if (currentPoint != null) {	
+				OverlayItem nsItem = new OverlayItem(currentPoint, "", "");
+				sItemizedOverlay.addOverlay(nsItem);
+
+			} else {
+				mView.postInvalidate();
+			}
+
+		}
 	}
 
 	@Override
 	protected void onDestroy() {
 		// TODO Auto-generated method stub
 		super.onDestroy();
-		locationManager.removeUpdates(listener);
+		if(locationManager != null) {
+			locationManager.removeUpdates(listener);
+		}
 	}
 
-	/**
-	 * Obtain all the location updates from Parse for the List of Ids and display the locations.
-	 */
-	private void getAndDisplayLocationUpdates(final HashMap<String,TrackerPoint> ids) {
-		new Thread ( new Runnable() {
-			@Override
-			public void run() {
-				// TODO Auto-generated method stub
-				while (true) {
+	private class DisplayParseData extends AsyncTask<HashMap<String, TrackerPoint>, Void, List<OverlayItem>> {
+		/**
+		 * Obtain all the location updates from Parse for the List of Ids and display the locations.
+		 */
+		@Override
+		protected List<OverlayItem> doInBackground(HashMap<String, TrackerPoint>... params) {
+			List<OverlayItem> listOfItems = new ArrayList<OverlayItem>();
+			try {
+
+				for(int i = 0; i<params.length;++i) {
+					/*
+					HashMap<String, TrackerPoint> ids = params[i];
 					Set<String> idSet = ids.keySet();
 					Iterator<String> iterator = idSet.iterator();
 					while(iterator.hasNext()) {
 						String id = iterator.next();
+						
 						GeoPoint currentPoint = getValuesFromParse(id);
 						if (currentPoint != null) {
 							TrackerPoint tPoint = ids.get(id);
 							OverlayItem nsItem = new OverlayItem(currentPoint, tPoint.getName(), "");
-							sOverlay.addOverlay(nsItem);
+							//sItemizedOverlay.addOverlay(nsItem);
+							listOfItems.add(nsItem);
 							tPoint.setCurrentPoint(currentPoint);
 							ids.put(id, tPoint);
 						} else {
 							Log.i(TAG, "No values obtained from Parse");
 							mView.postInvalidate();
+						
 						}
-
-					}
+						*/
 					
-					try {
-						Thread.sleep(Common.UPDATE_PARSE_FREQUENCY);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						listOfItems = retrieveDataFromEC();
+					
+				}
+				return listOfItems;
+			} catch(Exception e) {
+				e.printStackTrace();
+			}
+			return listOfItems;
+		}
+		
+		private List<OverlayItem> retrieveDataFromEC() {
+			List<OverlayItem> locations = new ArrayList<OverlayItem>();
+			try {
+				String url;
+				if (Common.friend) {
+					url = Common.URL + "/getLocation&friend=" + Common.MY_ID;
+				} else {
+					url = Common.URL + "/getLocation&organizer=" + Common.MY_ID;
+				}
+				HttpConnectionHelper helper = new HttpConnectionHelper();
+				String returnData = helper.getData(url);
+				JSONObject obj = new JSONObject(returnData);
+				if(!obj.isNull("FRIENDS")) {
+				JSONArray friends = obj.getJSONArray("FRIENDS");
+				for(int i=0;i<friends.length();++i) {
+					String id = friends.getJSONObject(i).getString("PHONE_NUMBER");
+					String loc = friends.getJSONObject(i).getString("LOC");
+					String[] locArray = loc.split(",");
+					String lat = locArray[0];
+					String lng = locArray[1];
+					int latPoint = (int)(Double.parseDouble(lat) * 1000000);
+					int lngPoint = (int)(Double.parseDouble(lng) * 1000000);
+					
+					GeoPoint point = new GeoPoint(latPoint, lngPoint);
+					OverlayItem item = new OverlayItem(point, id, "");
+					
+					locations.add(item);
+				}
+				}
+				String oId = obj.getString("ORGID");
+				String oLoc = obj.getString("ORG_LOC");
+				String[] locArray = oLoc.split(",");
+				String lat = locArray[0];
+				String lng = locArray[1];
+				int latPoint = (int)(Double.parseDouble(lat) * 1000000);
+				int lngPoint = (int)(Double.parseDouble(lng) * 1000000);
+				
+				GeoPoint point = new GeoPoint(latPoint, lngPoint);
+				OverlayItem item = new OverlayItem(point, oId, "");
+				locations.add(item);
+				return locations;
+				
+			} catch(Exception e) {
+				e.printStackTrace();
+			}
+			return locations;
+		}
+
+		private GeoPoint getValuesFromParse(String id) {
+			StringBuffer buffer = new StringBuffer();
+			GeoPoint point = null;
+			try {
+
+				HttpClient client = new DefaultHttpClient();
+				String query="where={" +"\"uid\":" +"\"" + id + "\"}&limit=1&order=-createdAt";
+				URI uri = new URI(
+						"https", 
+						"api.parse.com", 
+						"/1/classes/trackdata",
+						query,
+						null);
+				String url = uri.toASCIIString();
+				Log.d(TAG, "Parse URL" + url);
+				HttpGet get = new HttpGet(url);
+				get.setHeader("X-Parse-Application-Id", "8gA50gSiVTZzzJwXyLbCLVYWuXvGyA4fkrhnC6OK");
+				get.setHeader("X-Parse-REST-API-Key", "RY1gi8mxESXYEUCH6J8bWza6j7xmexmJ3xYcbPCj");
+				get.setHeader("Content-Type", "application/json");
+				HttpResponse response = client.execute(get);
+				StatusLine statusLine = response.getStatusLine();
+				int statusCode = statusLine.getStatusCode();
+				if (statusCode == 200) {
+					HttpEntity entity = response.getEntity();
+					InputStream content = entity.getContent();
+					BufferedReader reader = new BufferedReader(new InputStreamReader(content));
+					String line;
+					while ((line = reader.readLine()) != null) {
+						buffer.append(line);
 					}
 				}
-			}
-			
-			private GeoPoint getValuesFromParse(String id) {
-				StringBuffer buffer = new StringBuffer();
-				GeoPoint point = null;
-				try {
-
-					HttpClient client = new DefaultHttpClient();
-					String query="where={" +"\"uid\":" +"\"" + id + "\"}&limit=1&order=-createdAt";
-					URI uri = new URI(
-							"https", 
-							"api.parse.com", 
-							"/1/classes/trackdata",
-							query,
-							null);
-					String url = uri.toASCIIString();
-					Log.d(TAG, "Parse URL" + url);
-					HttpGet get = new HttpGet(url);
-					get.setHeader("X-Parse-Application-Id", "8gA50gSiVTZzzJwXyLbCLVYWuXvGyA4fkrhnC6OK");
-					get.setHeader("X-Parse-REST-API-Key", "RY1gi8mxESXYEUCH6J8bWza6j7xmexmJ3xYcbPCj");
-					get.setHeader("Content-Type", "application/json");
-					HttpResponse response = client.execute(get);
-					StatusLine statusLine = response.getStatusLine();
-					int statusCode = statusLine.getStatusCode();
-					if (statusCode == 200) {
-						HttpEntity entity = response.getEntity();
-						InputStream content = entity.getContent();
-						BufferedReader reader = new BufferedReader(new InputStreamReader(content));
-						String line;
-						while ((line = reader.readLine()) != null) {
-							buffer.append(line);
-						}
-					}
-					Log.i(TAG, "Recveived data from Parse" + buffer.toString());
-					JSONObject object = new JSONObject(buffer.toString());
-					JSONArray results = object.getJSONArray("results");
-					for (int i=0;i<results.length();++i) {
-						JSONObject objectLoc = (JSONObject)results.get(i);
-						JSONObject location = (JSONObject) objectLoc.get("location");
-						String latitude = location.getString("latitude");
-						String longitude = location.getString("longitude");
-						Log.i(TAG, "Returned value from parse" + latitude +":" + longitude);
-						point = new GeoPoint( (int)(Double.parseDouble(latitude) * 1e6), (int)(Double.parseDouble(longitude) * 1e6) );
-					}
-				} catch (Exception e) {
-					e.printStackTrace();
+				Log.i(TAG, "Recveived data from Parse" + buffer.toString());
+				JSONObject object = new JSONObject(buffer.toString());
+				JSONArray results = object.getJSONArray("results");
+				for (int i=0;i<results.length();++i) {
+					JSONObject objectLoc = (JSONObject)results.get(i);
+					JSONObject location = (JSONObject) objectLoc.get("location");
+					String latitude = location.getString("latitude");
+					String longitude = location.getString("longitude");
+					Log.i(TAG, "Returned value from parse" + latitude +":" + longitude);
+					point = new GeoPoint( (int)(Double.parseDouble(latitude) * 1e6), (int)(Double.parseDouble(longitude) * 1e6) );
 				}
-				return point;
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			return point;
+		}
+
+
+
+		@Override
+		protected void onPostExecute(List<OverlayItem> result) {
+			//sItemizedOverlay.clear();
+			Iterator<OverlayItem> iterator = result.iterator();		
+			while(iterator.hasNext()) {					
+				OverlayItem item = iterator.next();	
+				sItemizedOverlay.addOverlay(item);
+				Log.d(TAG, "On Post Execute called");
 			}
 
-		}).start();
+		}
+
+
 	}
 
 	@Override
@@ -256,7 +384,7 @@ public class WebViewActivity extends GDMapActivity implements OnClickListener{
 		return false;
 	}
 
-	
+
 	/**
 	 * @param control
 	 * @param sourceLocation
@@ -308,7 +436,7 @@ public class WebViewActivity extends GDMapActivity implements OnClickListener{
 			String newLine = helper.getData(newUrl);
 			JSONObject jMapData = new JSONObject(newLine);
 			JSONArray routes = jMapData.getJSONArray("route_geometry");
-		
+
 			for (int i=0;i<routes.length();++i) {
 				JSONArray startLocation = routes.getJSONArray(i);
 				String ssLat = startLocation.getString(0);
@@ -333,21 +461,46 @@ public class WebViewActivity extends GDMapActivity implements OnClickListener{
 			e.printStackTrace();
 		}
 	}
-	
+
 	private LocationListener listener = new LocationListener() {
-		   
+
 		public void onLocationChanged(Location location) {
-	      Log.d(TAG, "Updated location" + location.getLatitude() + "," + location.getLongitude());
-	      uploadDataToParse(location);
-	      
-	    }
-	    
-	   
+			Log.d(TAG, "Updated location" + location.getLatitude() + "," + location.getLongitude());
+			//uploadDataToParse(location);
+			uploadDataToEC(location);
+
+		}
+
+
 		@Override
 		public void onStatusChanged(String provider, int status, Bundle extras) {
 			// TODO Auto-generated method stub
-			
+
 		}
+
+		private void uploadDataToEC(Location location) {
+			JSONObject obj = new JSONObject();
+			String locString = String.valueOf(location.getLatitude()) + "," + String.valueOf(location.getLongitude());
+			String url;
+			try {
+				//Friend posting data
+				if(Common.friend == true) {
+					obj.put("MYID", Common.MY_ID);
+					url = Common.URL + "/updateFriendLocation";
+				} else {
+					obj.put("MYID", Common.ORGANIZER_ID);
+					url = Common.URL + "/updateOrganizerLocation";
+					
+				}
+				obj.put("MYID", Common.ORGANIZER_ID);
+				obj.put("MYLOCATION", locString);
+				HttpConnectionHelper helper = new HttpConnectionHelper();
+				helper.postData(url, obj);
+			} catch(Exception e) {
+				e.printStackTrace();
+			}
+		}
+
 		
 		private void uploadDataToParse(Location location) {
 			try{
@@ -386,14 +539,14 @@ public class WebViewActivity extends GDMapActivity implements OnClickListener{
 		@Override
 		public void onProviderDisabled(String provider) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 
 		@Override
 		public void onProviderEnabled(String provider) {
 			// TODO Auto-generated method stub
-			
+
 		}
 	};
 
@@ -404,35 +557,40 @@ public class WebViewActivity extends GDMapActivity implements OnClickListener{
 		if (v.getId() == R.id.enableTrackButton) {
 			checkForGps();
 			//Toast.makeText(getApplicationContext(), "Your location will be uploaded every 2 minutes for tracking purposes", Toast.LENGTH_LONG).show();
-			locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 120000, 1, listener);
-			getAndDisplayLocationUpdates(Common.friendMap);
+			locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, Common.UPDATE_PARSE_FREQUENCY, 1, listener);
+			parseTimer = new Timer();
+			parseTimerTask = new ParseTimerTask();
+			parseTimer.schedule(parseTimerTask,0,Common.UPDATE_PARSE_FREQUENCY);
 		} 
 		if (v.getId() == R.id.disableTrackButton) {
 			Log.i(TAG,"Location listener disabled");
 			locationManager.removeUpdates(listener);
+			if(parseTimer != null) {
+				parseTimer.cancel();
+			}
 		}
-		
+
 	}
 
 	private void checkForGps() {
 		// TODO Auto-generated method stub
 		if(! locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
 			final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		    builder.setMessage("Yout GPS seems to be disabled, do you want to enable it?")
-		           .setCancelable(false)
-		           .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-		               public void onClick( final DialogInterface dialog, final int id) {
-		                   startActivityForResult(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS), 100);
-		               }
-		           })
-		           .setNegativeButton("No", new DialogInterface.OnClickListener() {
-		               public void onClick(final DialogInterface dialog, final int id) {
-		                    dialog.cancel();
-		               }
-		           });
-		    final AlertDialog alert = builder.create();
-		    alert.show();
-			
+			builder.setMessage("Yout GPS seems to be disabled, do you want to enable it?")
+			.setCancelable(false)
+			.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+				public void onClick( final DialogInterface dialog, final int id) {
+					startActivityForResult(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS), 100);
+				}
+			})
+			.setNegativeButton("No", new DialogInterface.OnClickListener() {
+				public void onClick(final DialogInterface dialog, final int id) {
+					dialog.cancel();
+				}
+			});
+			final AlertDialog alert = builder.create();
+			alert.show();
+
 		}
 	}
 
@@ -442,7 +600,7 @@ public class WebViewActivity extends GDMapActivity implements OnClickListener{
 		Log.i("Activity Returned", "Result" + resultCode);
 		super.onActivityResult(requestCode, resultCode, data);
 	}
-	
+
 	@Override
 	public boolean onHandleActionBarItemClick(ActionBarItem item, int position) {
 		Intent intent;
@@ -459,7 +617,7 @@ public class WebViewActivity extends GDMapActivity implements OnClickListener{
 			intent.putExtra(ActionBarActivity.GD_ACTION_BAR_TITLE, "Invite Friends");
 			startActivityForResult(intent, Common.START_CONTACT_LIST);
 			break;
-			
+
 		case R.id.action_bar_home:
 			intent = new Intent(this, Main.class);
 			intent.putExtra(ActionBarActivity.GD_ACTION_BAR_TITLE, "LetsMeet");
@@ -472,6 +630,6 @@ public class WebViewActivity extends GDMapActivity implements OnClickListener{
 
 		return true;
 	}
-	
+
 }
 

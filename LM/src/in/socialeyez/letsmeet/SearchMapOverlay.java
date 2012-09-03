@@ -68,19 +68,21 @@ public class SearchMapOverlay extends com.google.android.maps.Overlay implements
 		obj = myApp.getObj();
 		try {
 			// Populate the JSON Object 
-			finalObject = new JSONObject(jsonObjectString);
-			JSONArray fsItems = new JSONArray();
-			JSONObject indFsItem = new JSONObject();
-			indFsItem.put("name", "Destination");
-			indFsItem.put("address", address);
-			indFsItem.put("id", 0);
-			indFsItem.put("lat", destinationLat);
-			indFsItem.put("lng", destinationLng);
-			indFsItem.put("selected", "yes");
-			fsItems.put(indFsItem);
-			finalObject.put("FSITEMS",fsItems);
-			finalObject.put("NOFS", "yes");
-			
+			if(jsonObjectString != null) {
+				finalObject = new JSONObject(jsonObjectString);
+				JSONArray fsItems = new JSONArray();
+				JSONObject indFsItem = new JSONObject();
+				indFsItem.put("name", "Destination");
+				indFsItem.put("address", address);
+				indFsItem.put("id", 0);
+				indFsItem.put("lat", destinationLat);
+				indFsItem.put("lng", destinationLng);
+				indFsItem.put("selected", "yes");
+				fsItems.put(indFsItem);
+				finalObject.put("FSITEMS",fsItems);
+				finalObject.put("NOFS", "yes");
+			}
+
 		} catch ( Exception e) {
 			e.printStackTrace();
 		}
@@ -116,6 +118,31 @@ public class SearchMapOverlay extends com.google.android.maps.Overlay implements
 			buttonMessage = "Get directions";
 		} else {
 			buttonMessage = "Go";
+			// If the user has entered the location then fill in the FSITEMS object here itself
+			String userAddress = Common.getAddressLocationName();
+			String userAddressLoc = Common.getAddressLocationLatLng();
+			if (userAddress != null && userAddressLoc != null) {
+				try {
+					JSONArray fsItems = new JSONArray();
+					JSONObject indFsItem = new JSONObject();
+					indFsItem.put("name", userAddress);
+					indFsItem.put("address", userAddress);
+					indFsItem.put("id", 0);
+					String[] userAddressArr = userAddressLoc.split(",");
+					String userLocLat = userAddressArr[0];
+					String userLocLng = userAddressArr[1];
+					indFsItem.put("lat", Double.parseDouble(userLocLat));
+					indFsItem.put("lng", Double.parseDouble(userLocLng));
+					indFsItem.put("selected", "yes");
+
+					fsItems.put(indFsItem);
+					finalObject.put("FSITEMS",fsItems);
+					finalObject.put("NOFS", "yes");
+				} catch(Exception e) {
+					e.printStackTrace();
+				}
+
+			}
 		}
 		dialog.setButton(AlertDialog.BUTTON_NEGATIVE,buttonMessage, this);
 		dialog.show();
@@ -139,9 +166,12 @@ public class SearchMapOverlay extends com.google.android.maps.Overlay implements
 
 			//No reminder, meeting right away
 		} else if(which == AlertDialog.BUTTON_NEGATIVE) {
-			HttpConnectionHelper connectionHelper = new HttpConnectionHelper();
-			connectionHelper.postData(Common.URL + "/id=" + Common.MY_ID, finalObject);
-			obj.setupMeetingRightNow();	
+			if(finalObject != null) {
+				HttpConnectionHelper connectionHelper = new HttpConnectionHelper();
+				connectionHelper.postData(Common.URL + "/id=" + Common.MY_ID, finalObject);
+			}
+				obj.setupMeetingRightNow();	
+			
 		}
 	}
 
@@ -234,7 +264,7 @@ public class SearchMapOverlay extends com.google.android.maps.Overlay implements
 						SendSms sendSms = new SendSms(context);
 						sendSms.sendBulkSms(contacts);
 					}
-					
+
 				}catch (Exception e) {
 					e.printStackTrace();
 				}

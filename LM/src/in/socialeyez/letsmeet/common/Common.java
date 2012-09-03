@@ -14,10 +14,8 @@ import android.location.LocationManager;
  * Common class for all the required constants.
  */
 public final class Common {
-	public static final String URL = "http://ec2-122-248-211-48.ap-southeast-1.compute.amazonaws.com:8889";
+	public static final String URL = "http://ec2-122-248-211-48.ap-southeast-1.compute.amazonaws.com:8890";
 	public static String MY_ID;
-	public static final String SINGLE_USER_ID = "1111";
-	public static final String SINGLE_USER_FRIEND_ID = "55555";
 	public static boolean friend;
 	public static boolean confirm = false;
 	// public static List<GeoPoint> friendList;
@@ -31,6 +29,7 @@ public final class Common {
 	
 	//Parse update frequency in milliseconds
 	public static final long UPDATE_PARSE_FREQUENCY = 120000;
+	public static String ORGANIZER_ID = "";
 
 	public static final long UPDATE_MAP_FREQUENCY = 5000;
 	public static final String STORE_FILE_NAME = "mytriphistory.txt";

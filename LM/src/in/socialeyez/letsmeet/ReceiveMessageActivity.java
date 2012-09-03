@@ -123,7 +123,7 @@ public class ReceiveMessageActivity extends GDActivity implements DialogInterfac
 					if(null == date) {
 						//Push the current location to the back-end server as a JSON object.
 						//String locString = "12.981596" + "," + "77.628913";
-						connectionHelper.postData(Common.URL + "/id=" + Common.MY_ID, obj);
+						connectionHelper.postData(Common.URL + "/id=" + Common.ORGANIZER_ID, obj);
 						Intent mapIntent = new Intent(getApplicationContext(), CommonMapActivity.class);
 						mapIntent.putExtra("singleusermode", false);
 						mapIntent.putExtra(ActionBarActivity.GD_ACTION_BAR_TITLE, "Group locations");

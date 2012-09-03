@@ -198,27 +198,7 @@ public class InviteContactsActivity extends GDActivity implements OnClickListene
 			finalObject.put("FRIENDS", selectedContacts);
 		if(v.getId() == R.id.contactsbutton) {
 			
-				// If the user has entered the location then fill in the FSITEMS object here itself
-				String userAddress = Common.getAddressLocationName();
-				String userAddressLoc = Common.getAddressLocationLatLng();
-				if (userAddress != null && userAddressLoc != null) {
-					JSONArray fsItems = new JSONArray();
-					JSONObject indFsItem = new JSONObject();
-					indFsItem.put("name", userAddress);
-					indFsItem.put("address", userAddress);
-					indFsItem.put("id", 0);
-					String[] userAddressArr = userAddressLoc.split(",");
-					String userLocLat = userAddressArr[0];
-					String userLocLng = userAddressArr[1];
-					indFsItem.put("lat", Double.parseDouble(userLocLat));
-					indFsItem.put("lng", Double.parseDouble(userLocLng));
-					indFsItem.put("selected", "yes");
-
-					fsItems.put(indFsItem);
-					finalObject.put("FSITEMS",fsItems);
-					finalObject.put("NOFS", "yes");
-
-				}
+			
 
 				Log.i("ContactsList", String.valueOf(selectedContacts.length()));
 				Intent mapIntent = new Intent(this, SearchMapActivity.class);
