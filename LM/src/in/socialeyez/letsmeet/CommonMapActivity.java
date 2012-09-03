@@ -23,6 +23,7 @@ import org.json.JSONObject;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationManager;
@@ -198,6 +199,13 @@ public class CommonMapActivity extends GDMapActivity{
 		super.onResume();
 
 	}
+	
+	@Override
+	public void onConfigurationChanged(Configuration newConfig) {
+		// TODO Auto-generated method stub
+		super.onConfigurationChanged(newConfig);
+		
+	}
 
 	@Override
 	protected void onDestroy() {
@@ -243,7 +251,11 @@ public class CommonMapActivity extends GDMapActivity{
 
 			try {
 				String url = null;
-				url = Common.URL + "/id=" + Common.MY_ID;
+				if(Common.friend) {
+					url = Common.URL + "/id=" + Common.ORGANIZER_ID;
+				} else {
+					url = Common.URL + "/id=" + Common.MY_ID;
+				}
 				String obtainedLocations = connectionHelper.getData(url);
 				Log.i(TAG, "Locations obtained from backend ::::" + obtainedLocations);
 				JSONObject object = new JSONObject(obtainedLocations);

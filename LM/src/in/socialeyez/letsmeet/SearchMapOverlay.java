@@ -170,7 +170,7 @@ public class SearchMapOverlay extends com.google.android.maps.Overlay implements
 				HttpConnectionHelper connectionHelper = new HttpConnectionHelper();
 				connectionHelper.postData(Common.URL + "/id=" + Common.MY_ID, finalObject);
 			}
-				obj.setupMeetingRightNow();	
+			obj.setupMeetingRightNow();	
 			
 		}
 	}

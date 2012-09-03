@@ -62,6 +62,10 @@ import com.google.android.maps.OverlayItem;
  * @author pradeep
  *
  */
+/**
+ * @author pradeep
+ *
+ */
 public class WebViewActivity extends GDMapActivity implements OnClickListener{
 
 	private static final String TAG = "WebViewActivity";
@@ -113,10 +117,11 @@ public class WebViewActivity extends GDMapActivity implements OnClickListener{
 			mOverlay.add(dItemizedOverlay);
 			controller.setZoom(15);
 			mView.setBuiltInZoomControls(true);
-
-			final List<Overlay> newOverlay = mView.getOverlays();
-
-			new Handler().post(new Runnable() {
+			
+			/*
+			 * Changed to handler in order to save some exceptions resulting from Thread class.
+			 */
+			new Thread(new Runnable() {
 				public void run() {
 					int color = 999;
 					/*
@@ -124,7 +129,6 @@ public class WebViewActivity extends GDMapActivity implements OnClickListener{
 					 */				
 					HashMap<String, TrackerPoint> map = new HashMap<String, TrackerPoint>();
 					map.putAll(Common.friendMap);
-
 					Collection<TrackerPoint> values = (Collection<TrackerPoint>) map.values();
 					Iterator<TrackerPoint> iterator = values.iterator();
 					while(iterator.hasNext()) {
@@ -141,7 +145,7 @@ public class WebViewActivity extends GDMapActivity implements OnClickListener{
 					}
 
 				}
-			});
+			}).start();
 
 			//Initialize the timer task for getting directions.
 			parseTimerTask = new ParseTimerTask();
@@ -150,7 +154,6 @@ public class WebViewActivity extends GDMapActivity implements OnClickListener{
 			if (parseTimer != null) {
 				parseTimer.schedule(parseTimerTask,0,Common.UPDATE_MAP_FREQUENCY);
 			}
-
 			Toast.makeText(getApplicationContext(), "Please wait for directions",Toast.LENGTH_LONG).show();
 
 
@@ -181,7 +184,7 @@ public class WebViewActivity extends GDMapActivity implements OnClickListener{
 			handler.post(new Runnable() {
 				public void run() {
 					try {
-						new DisplayParseData().execute(Common.friendMap);
+						new DisplayParseData().execute();
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -197,21 +200,7 @@ public class WebViewActivity extends GDMapActivity implements OnClickListener{
 	public void onConfigurationChanged(Configuration newConfig) {
 		// TODO Auto-generated method stub
 		super.onConfigurationChanged(newConfig);
-		HashMap<String, TrackerPoint> ids = new HashMap<String, TrackerPoint>(Common.friendMap);
-		Set<String> idSet = ids.keySet();
-		Iterator<String> iterator = idSet.iterator();
-		while(iterator.hasNext()) {
-			String id = iterator.next();
-			GeoPoint currentPoint = ids.get(id).getCurrentPoint();
-			if (currentPoint != null) {	
-				OverlayItem nsItem = new OverlayItem(currentPoint, "", "");
-				sItemizedOverlay.addOverlay(nsItem);
-
-			} else {
-				mView.postInvalidate();
-			}
-
-		}
+		
 	}
 
 	@Override
@@ -223,41 +212,19 @@ public class WebViewActivity extends GDMapActivity implements OnClickListener{
 		}
 	}
 
-	private class DisplayParseData extends AsyncTask<HashMap<String, TrackerPoint>, Void, List<OverlayItem>> {
+	/**
+	 * @author pradeep
+	 * Changed from Thread to Handler and finally to AsyncTask. Repeatedly fetch locations from the node backend and display them.
+	 */
+	private class DisplayParseData extends AsyncTask<Void, Void, List<OverlayItem>> {
 		/**
 		 * Obtain all the location updates from Parse for the List of Ids and display the locations.
 		 */
 		@Override
-		protected List<OverlayItem> doInBackground(HashMap<String, TrackerPoint>... params) {
+		protected List<OverlayItem> doInBackground(Void ...params) {
 			List<OverlayItem> listOfItems = new ArrayList<OverlayItem>();
 			try {
-
-				for(int i = 0; i<params.length;++i) {
-					/*
-					HashMap<String, TrackerPoint> ids = params[i];
-					Set<String> idSet = ids.keySet();
-					Iterator<String> iterator = idSet.iterator();
-					while(iterator.hasNext()) {
-						String id = iterator.next();
-						
-						GeoPoint currentPoint = getValuesFromParse(id);
-						if (currentPoint != null) {
-							TrackerPoint tPoint = ids.get(id);
-							OverlayItem nsItem = new OverlayItem(currentPoint, tPoint.getName(), "");
-							//sItemizedOverlay.addOverlay(nsItem);
-							listOfItems.add(nsItem);
-							tPoint.setCurrentPoint(currentPoint);
-							ids.put(id, tPoint);
-						} else {
-							Log.i(TAG, "No values obtained from Parse");
-							mView.postInvalidate();
-						
-						}
-						*/
-					
-						listOfItems = retrieveDataFromEC();
-					
-				}
+					listOfItems = retrieveDataFromEC();
 				return listOfItems;
 			} catch(Exception e) {
 				e.printStackTrace();
@@ -265,6 +232,11 @@ public class WebViewActivity extends GDMapActivity implements OnClickListener{
 			return listOfItems;
 		}
 		
+		
+		/**
+		 * @return List Of Overlay Items to be added to MapItemizedOverlay
+		 * Doesn't take any inputs as the inputs are already stored in Common
+		 */
 		private List<OverlayItem> retrieveDataFromEC() {
 			List<OverlayItem> locations = new ArrayList<OverlayItem>();
 			try {
@@ -280,7 +252,7 @@ public class WebViewActivity extends GDMapActivity implements OnClickListener{
 				if(!obj.isNull("FRIENDS")) {
 				JSONArray friends = obj.getJSONArray("FRIENDS");
 				for(int i=0;i<friends.length();++i) {
-					String id = friends.getJSONObject(i).getString("PHONE_NUMBER");
+					String id = friends.getJSONObject(i).getString("NAME");
 					String loc = friends.getJSONObject(i).getString("LOC");
 					String[] locArray = loc.split(",");
 					String lat = locArray[0];
@@ -301,7 +273,6 @@ public class WebViewActivity extends GDMapActivity implements OnClickListener{
 				String lng = locArray[1];
 				int latPoint = (int)(Double.parseDouble(lat) * 1000000);
 				int lngPoint = (int)(Double.parseDouble(lng) * 1000000);
-				
 				GeoPoint point = new GeoPoint(latPoint, lngPoint);
 				OverlayItem item = new OverlayItem(point, oId, "");
 				locations.add(item);
@@ -313,6 +284,9 @@ public class WebViewActivity extends GDMapActivity implements OnClickListener{
 			return locations;
 		}
 
+		/*
+		 * Deprecated
+		 */
 		private GeoPoint getValuesFromParse(String id) {
 			StringBuffer buffer = new StringBuffer();
 			GeoPoint point = null;
@@ -361,7 +335,18 @@ public class WebViewActivity extends GDMapActivity implements OnClickListener{
 			return point;
 		}
 
+		@Override
+		protected void onPreExecute() {
+			// TODO Auto-generated method stub
+			super.onPreExecute();
+			mView.invalidate();
+		}
 
+		protected void onCancelled() {
+			// TODO Auto-generated method stub
+			super.onCancelled();
+
+		}
 
 		@Override
 		protected void onPostExecute(List<OverlayItem> result) {
@@ -502,6 +487,10 @@ public class WebViewActivity extends GDMapActivity implements OnClickListener{
 		}
 
 		
+		/**
+		 * @param location
+		 * Deprecated
+		 */
 		private void uploadDataToParse(Location location) {
 			try{
 				Log.i(TAG, "Uploading data to parse");
@@ -572,6 +561,9 @@ public class WebViewActivity extends GDMapActivity implements OnClickListener{
 
 	}
 
+	/**
+	 * Alert user if GPS is not turned on.
+	 */
 	private void checkForGps() {
 		// TODO Auto-generated method stub
 		if(! locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
@@ -601,6 +593,10 @@ public class WebViewActivity extends GDMapActivity implements OnClickListener{
 		super.onActivityResult(requestCode, resultCode, data);
 	}
 
+	/* (non-Javadoc)
+	 * @see greendroid.app.GDMapActivity#onHandleActionBarItemClick(greendroid.widget.ActionBarItem, int)
+	 * Greendroid overrides to bring up the action bar.
+	 */
 	@Override
 	public boolean onHandleActionBarItemClick(ActionBarItem item, int position) {
 		Intent intent;
