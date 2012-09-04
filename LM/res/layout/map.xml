@@ -24,7 +24,7 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
         android:layout_below="@+id/maEditDestinationAddress"
-        android:apiKey="0SnFAsCYe_q4CcChsvDSegqZJLX03RfEkQbonXA"
+        android:apiKey="@string/google_map_api_key_debug"
         android:clickable="true" />
     
     <!--  

@@ -8,7 +8,7 @@
         android:id="@+id/textViewMain"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="LetsMeet is group tracking application.It lets you search for a place on the map, invite friends to that place and with their permission lets you track them until the meeting starts. You can also use the app to just track your journeys when you are traveling alone "
+        android:text="TripLaud is a collaborative group tracking and location choosing application.It lets you search for a place on the map, invite friends to that place and with their permission lets you track them until the meeting starts. You can also use the app to just track your journeys when you are traveling alone "
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <TextView

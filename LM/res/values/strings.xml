@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">LetsMeet</string>
-	<string name="google_map_api_key_debug"></string>
+    <string name="app_name">TripLaud-Beta</string>
+	<string name="google_map_api_key_debug">0SnFAsCYe_q4CcChsvDSegqZJLX03RfEkQbonXA</string>
+	<string name="google_map_api_key_release">0SnFAsCYe_q6hFf35HvDxYynFe-NIq5N8LLXZlA</string>
     <!-- Activities labels -->
     <string name="general_info_label">General information</string>   
     <string name="action_bar_activity_label">ActionBarActivity</string>
@@ -9,9 +10,4 @@
     <string name="license">License</string>
     <string name="mainmessage">License</string>
     <string name="lcmessage">License</string>
-      
-      
-    
-    
-  
 </resources>

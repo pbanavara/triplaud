@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="in.socialeyez.letsmeet"
+    package="com.triplaud"
     android:versionCode="1"
     android:versionName="1.0" >
 
@@ -38,13 +38,13 @@
             android:name=".contacts.InviteContactsActivity" />
         
         <activity
-            android:name="in.socialeyez.letsmeet.ReceiveMessageActivity" />
+            android:name="com.triplaud.ReceiveMessageActivity" />
         <activity
             android:name=".common.SendSms" />
         <activity
             android:name=".CommonMapActivity" />
         <activity
-            android:name="in.socialeyez.letsmeet.MapUs" />
+            android:name="com.triplaud.MapUs" />
         <receiver android:name=".common.ReceiveSms" android:enabled="true">
 			<intent-filter>
 				<action android:name="android.provider.Telephony.SMS_RECEIVED" />
@@ -53,8 +53,8 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
 		</receiver>
-		 <receiver android:name = ".alarm.AlarmReceiver" android:enabled="true">
-			<intent-filter>
+		 <receiver android:name = ".alarm.AlarmReceiver">
+		     <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
 		</receiver>
@@ -69,8 +69,9 @@
             android:name=".WebViewActivity"
             android:configChanges="keyboardHidden|orientation">
 			</activity>
-        <activity android:name = ".alarm.AlarmActivity"
-            android:theme="@android:style/Theme.Dialog">
+        <activity 
+            android:name = ".alarm.AlarmActivity"
+			android:theme= "@android:style/Theme.Dialog">
         </activity>
         
     </application>

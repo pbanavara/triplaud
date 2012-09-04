@@ -9,7 +9,7 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:layout_above="@+id/enableTrackButton"
-        android:apiKey="0SnFAsCYe_q4CcChsvDSegqZJLX03RfEkQbonXA"
+        android:apiKey="@string/google_map_api_key_debug"
         android:clickable="true" />
 
     <Button
