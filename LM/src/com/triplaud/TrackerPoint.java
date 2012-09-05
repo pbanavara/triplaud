@@ -8,29 +8,29 @@ import com.google.android.maps.GeoPoint;
  *
  */
 public class TrackerPoint {
-	private GeoPoint initialPoint;
-	private String name;
-	public String getName() {
-		return name;
-	}
-	public void setName(String name) {
-		this.name = name;
-	}
-	
-	public GeoPoint getInitialPoint() {
-		return initialPoint;
-	}
-	public void setInitialPoint(GeoPoint initialPoint) {
-		this.initialPoint = initialPoint;
-	}
-	public GeoPoint getCurrentPoint() {
-		return currentPoint;
-	}
-	public void setCurrentPoint(GeoPoint currentPoint) {
-		this.currentPoint = currentPoint;
-	}
-	private GeoPoint currentPoint;
-	
-	
+    private GeoPoint initialPoint;
+    private String name;
+    public String getName() {
+        return name;
+    }
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public GeoPoint getInitialPoint() {
+        return initialPoint;
+    }
+    public void setInitialPoint(GeoPoint initialPoint) {
+        this.initialPoint = initialPoint;
+    }
+    public GeoPoint getCurrentPoint() {
+        return currentPoint;
+    }
+    public void setCurrentPoint(GeoPoint currentPoint) {
+        this.currentPoint = currentPoint;
+    }
+    private GeoPoint currentPoint;
+
+
 
 }

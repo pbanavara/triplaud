@@ -8,16 +8,16 @@ import android.widget.Filter;
  */
 public class ContactsFilter extends Filter {
 
-	@Override
-	protected FilterResults performFiltering(CharSequence constraint) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    protected FilterResults performFiltering(CharSequence constraint) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	@Override
-	protected void publishResults(CharSequence constraint, FilterResults results) {
-		// TODO Auto-generated method stub
+    @Override
+    protected void publishResults(CharSequence constraint, FilterResults results) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
 }
