@@ -4,10 +4,14 @@
     android:layout_height="fill_parent"
     android:orientation="vertical" >
 
+    
+
     <TextView
         android:id="@+id/chMeetText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
         android:text="Please select one of these meeting place choices. The app will then search for meeting places based on the selected theme and the selected contact&apos;s current locations"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
@@ -16,47 +20,39 @@
         android:id="@+id/radioGroup1"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/chmeetText"
-        android:orientation="vertical"
-        android:paddingTop="20dp" >
-    </RadioGroup>
-
-    <RadioButton
-        android:id="@+id/chRadioCoffee"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/chMeetText"
-        android:layout_marginTop="22dp"
-        android:checked="true"
-        android:paddingTop="10dp"
-        android:text="Coffee/Cafe" />
+        android:orientation="vertical"
+        android:paddingTop="10dp" >
 
-    <RadioButton
-        android:id="@+id/chRadioRestaurant"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/chRadioCoffee"
-        android:paddingTop="10dp"
-        android:text="Restaurant" />
+        <RadioButton
+            android:id="@+id/chRadioCoffee"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="22dp"
+            android:checked="true"
+            android:paddingTop="10dp"
+            android:text="Coffee/Cafe" />
 
-    <RadioButton
-        android:id="@+id/chRadioBar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/chRadioRestaurant"
-        android:paddingTop="10dp"
-        android:text="Bar/Pub" />
+        <RadioButton
+            android:id="@+id/chRadioBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="10dp"
+            android:text="Bar/Pub" />
 
+        <RadioButton
+            android:id="@+id/chRadioRestaurant"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="10dp"
+            android:text="Restaurant" />
+    </RadioGroup>
     <Button
         android:id="@+id/chButtonYes"
         android:layout_width="100dp"
         android:layout_height="50dp"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/chRadioBar"
-        android:layout_marginTop="25dp"
+        android:layout_below="@id/radioGroup1"
         android:paddingTop="10dp"
         android:text="OK" />
 

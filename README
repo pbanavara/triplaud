@@ -1,0 +1,9 @@
+This is the  README for TripLaud a group tracking application.
+
+The source is organized under two directories - LM and Letsmeet-server.
+
+LM contains the android client code.
+Letsmeet-server contains the node.js backend code.
+nodeTrial contains some javascript code that I used to paly around with leaflet and other mapping technologies.
+Letsmeet directory is deprecated - the code is purely there for any learning and back-referencing purposes.
+Am working on cleaning up the code and adding the required documentation.

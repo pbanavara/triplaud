@@ -17,16 +17,16 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/textViewMain"
         android:layout_toRightOf="@+id/maImageLocate"
+        android:paddingTop="10dp"
         android:text="Click on this action bar icon if you are traveling alone, want to search your address, and want to track your journey."
-        android:textAppearance="?android:attr/textAppearanceMedium" 
-        android:paddingTop="10dp"/>
+        android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <ImageView
         android:id="@+id/maImageLocate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/textViewMain"
-     	  android:paddingTop="10dp"
+        android:paddingTop="10dp"
         android:src="@drawable/gd_action_bar_locate_myself" />
 
     <TextView
@@ -35,16 +35,16 @@
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/maTextLocate"
         android:layout_below="@+id/maTextLocate"
+        android:paddingTop="10dp"
         android:text="Click on this action bar icon if you want to invite your friends to a meeting place and wish to track them."
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:paddingTop="10dp" />
+        android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <ImageView
         android:id="@+id/maImageFriends"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/maTextLocate"
-        android:src="@drawable/gd_action_bar_all_friends" 
-        android:paddingTop="10dp" />
+        android:paddingTop="10dp"
+        android:src="@drawable/gd_action_bar_all_friends" />
 
 </RelativeLayout>

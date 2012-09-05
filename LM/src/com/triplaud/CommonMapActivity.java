@@ -313,7 +313,7 @@ public class CommonMapActivity extends GDMapActivity{
 								friendPoint.setName(name);
 
 								if (!Common.friendMap.containsKey(id)) {
-									displayMessage = "Friends responded";
+									//displayMessage = "Friends responded";
 									Common.friendMap.put(id, friendPoint);
 								}
 								OverlayItem fItem = new OverlayItem(point,"Friend: " + name, organizer + ":" + id);

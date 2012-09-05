@@ -26,6 +26,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.android.apps.analytics.GoogleAnalyticsTracker;
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapController;
 import com.google.android.maps.MapView;
@@ -61,11 +62,13 @@ public class SearchMapActivity extends GDMapActivity implements OnClickListener 
 	private ArrayList<String> contacts;
 	private SearchMapOverlay mapOverlay;
 	private String jsonObjectString;
-	
+	GoogleAnalyticsTracker tracker;
 
 	@Override
 	protected void onCreate(Bundle bundle) {
 		super.onCreate(bundle);	
+		tracker = GoogleAnalyticsTracker.getInstance();
+		tracker.startNewSession("UA-34562016-1", this);
 		context = SearchMapActivity.this;
 		Bundle extras = getIntent().getExtras();
 		
@@ -86,6 +89,7 @@ public class SearchMapActivity extends GDMapActivity implements OnClickListener 
 		setActionBarContentView(R.layout.map);
 		addActionBarItem(Type.LocateMyself, R.id.action_bar_search);
 		addActionBarItem(Type.AllFriends, R.id.action_bar_allfriends);
+		
 		//End GreenDroid
 		drawable = this.getResources().getDrawable(R.drawable.marker);
 		fsDrawable = getApplicationContext().getResources().getDrawable(R.drawable.orangeicon);
@@ -123,6 +127,7 @@ public class SearchMapActivity extends GDMapActivity implements OnClickListener 
 		// TODO Auto-generated method stub
 		//Common.setDestinationTime(null);
 		super.onDestroy();
+		tracker.stopSession();
 	}
 
 	@Override
@@ -142,6 +147,7 @@ public class SearchMapActivity extends GDMapActivity implements OnClickListener 
 	public void onClick(View view) {
 		// TODO Auto-generated method stub
 		if(view.getId() == R.id.maSearchButton) {
+			tracker.trackPageView("/search_address");
 			geoCoder = new Geocoder(this, Locale.ENGLISH);
 			List<Address> addresses = null;
 			address = textSearch.getText().toString();
@@ -193,12 +199,14 @@ public class SearchMapActivity extends GDMapActivity implements OnClickListener 
 		Intent intent;
 		switch (item.getItemId()) {
 		case R.id.action_bar_search:
+			tracker.trackPageView("/search_single_user");
 			intent = new Intent(this, SearchMapActivity.class);
 			intent.putExtra(ActionBarActivity.GD_ACTION_BAR_TITLE, "Search meeting place");
 			startActivity(intent);
 			break;
 
 		case R.id.action_bar_allfriends:
+			tracker.trackPageView("/search_group");
 			//Start the contactsList Activity with the required parameters
 			intent = new Intent(this, InviteContactsActivity.class);
 			intent.putExtra(ActionBarActivity.GD_ACTION_BAR_TITLE, "Invite Friends");
@@ -206,8 +214,9 @@ public class SearchMapActivity extends GDMapActivity implements OnClickListener 
 			break;
 			
 		case R.id.action_bar_home:
+			tracker.trackPageView("/home_page");
 			intent = new Intent(this, Main.class);
-			intent.putExtra(ActionBarActivity.GD_ACTION_BAR_TITLE, "LetsMeet");
+			intent.putExtra(ActionBarActivity.GD_ACTION_BAR_TITLE, "TripLaud-Beta");
 			startActivity(intent);
 			break;
 

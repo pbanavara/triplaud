@@ -22,6 +22,7 @@ import android.util.Log;
 import android.widget.DatePicker;
 import android.widget.TimePicker;
 
+import com.google.android.apps.analytics.GoogleAnalyticsTracker;
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapView;
 import com.triplaud.alarm.SetAlarm;
@@ -50,8 +51,10 @@ public class SearchMapOverlay extends com.google.android.maps.Overlay implements
 	private UploadObject obj;
 	private static final String REMINDER_DIALOG_MESSAGE = "If you want to travel right away, click on Get Directions button, or to set a location aware reminder click on Set Reminder";
 	private static final String CONFIRM_REMINDER_DIALOG_MESSAGE="Confirm Reminder";
-
+	
+	GoogleAnalyticsTracker tracker;
 	public SearchMapOverlay (Context context, GeoPoint destination, String address, ArrayList<String> contacts, String jsonObjectString) {
+		tracker = GoogleAnalyticsTracker.getInstance();
 		this.context = context;
 		this.destinationPoint = destination;
 		this.address = address;
@@ -151,6 +154,7 @@ public class SearchMapOverlay extends com.google.android.maps.Overlay implements
 		Common.setAddressLocationLatLng(String.valueOf(destinationLat) + "," + String.valueOf(destinationLng));
 		//Set reminder
 		if(which ==  AlertDialog.BUTTON_POSITIVE) {
+			tracker.trackPageView("/SetReminder");
 			//Set Reminder
 			Calendar c = Calendar.getInstance(Locale.getDefault());
 			mYear = c.get(Calendar.YEAR);
@@ -161,6 +165,7 @@ public class SearchMapOverlay extends com.google.android.maps.Overlay implements
 
 			//No reminder, meeting right away
 		} else if(which == AlertDialog.BUTTON_NEGATIVE) {
+			tracker.trackPageView("/Meeting-known-location");
 			if(finalObject != null) {
 				HttpConnectionHelper connectionHelper = new HttpConnectionHelper();
 				connectionHelper.postData(Common.URL + "/id=" + Common.MY_ID, finalObject);

@@ -12,14 +12,14 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.view.Window;
 
+import com.google.android.apps.analytics.GoogleAnalyticsTracker;
 import com.triplaud.common.Common;
 import com.triplaud.contacts.InviteContactsActivity;
 import com.triplaud.locationutil.BestLocationFinder;
 
 public class Main extends GDActivity {
-	
-	
-
+	// Google analytics code
+	GoogleAnalyticsTracker tracker;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		//Clear and initialize all previous values
@@ -30,6 +30,9 @@ public class Main extends GDActivity {
 		Common.setAddressLocationName(null);
 		
 		super.onCreate(savedInstanceState);
+		//Initialize google tracker code
+		tracker = GoogleAnalyticsTracker.getInstance();
+		tracker.startNewSession("UA-34562016-1", this);
 		//End Hide title bar
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setTitle(R.string.app_name);
@@ -40,6 +43,7 @@ public class Main extends GDActivity {
 		setActionBarContentView(R.layout.main);
 		addActionBarItem(Type.LocateMyself, R.id.action_bar_search);
 		addActionBarItem(Type.AllFriends, R.id.action_bar_allfriends);
+		
 		//End GreenDroid
 				
 	}
@@ -49,12 +53,14 @@ public class Main extends GDActivity {
 		Intent intent;
 		switch (item.getItemId()) {
 		case R.id.action_bar_search:
+			tracker.trackPageView("/search_single_user");
 			intent = new Intent(this, SearchMapActivity.class);
 			intent.putExtra(ActionBarActivity.GD_ACTION_BAR_TITLE, "Search meeting place");
 			startActivity(intent);
 			break;
 
 		case R.id.action_bar_allfriends:
+			tracker.trackPageView("/search_group");
 			//Start the contactsList Activity with the required parameters
 			intent = new Intent(this, InviteContactsActivity.class);
 			intent.putExtra(ActionBarActivity.GD_ACTION_BAR_TITLE, "Invite Friends");
@@ -62,8 +68,9 @@ public class Main extends GDActivity {
 			break;
 			
 		case R.id.action_bar_home:
+			tracker.trackPageView("/home_page");
 			intent = new Intent(this, Main.class);
-			intent.putExtra(ActionBarActivity.GD_ACTION_BAR_TITLE, "LetsMeet");
+			intent.putExtra(ActionBarActivity.GD_ACTION_BAR_TITLE, "TripLaud-Beta");
 			startActivity(intent);
 			break;
 
@@ -78,6 +85,7 @@ public class Main extends GDActivity {
 	protected void onDestroy() {
 		//Common.setDestinationTime(null);
 		super.onDestroy();
+		tracker.stopSession();
 	}
 	
 

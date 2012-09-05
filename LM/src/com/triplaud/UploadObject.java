@@ -2,7 +2,6 @@ package com.triplaud;
 
 import greendroid.app.ActionBarActivity;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -10,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 
+import com.google.android.apps.analytics.GoogleAnalyticsTracker;
 import com.google.android.maps.GeoPoint;
 import com.triplaud.common.Common;
 import com.triplaud.common.SendSms;
@@ -23,8 +23,9 @@ public class UploadObject {
 	private GeoPoint destination;
 	private double destinationLat;
 	private double destinationLng;
-	
+	GoogleAnalyticsTracker tracker;
 	public UploadObject(ArrayList<String> contacts, Context context, GeoPoint destination) {
+		tracker = GoogleAnalyticsTracker.getInstance();
 		this.contacts = contacts;
 		this.context = context;
 		this.destination = destination;
@@ -54,6 +55,7 @@ public class UploadObject {
 			if (!Common.friendMap.containsKey(organizer)) {
 				Common.friendMap.put(organizer, toPoint);
 			}
+			tracker.trackPageView("/Directions");
 			intent = new Intent(context, WebViewActivity.class);
 			intent.putExtra(ActionBarActivity.GD_ACTION_BAR_TITLE, "Directions");
 			intent.putExtra("DEST", String.valueOf(destinationLat) + "," + String.valueOf(destinationLng));
