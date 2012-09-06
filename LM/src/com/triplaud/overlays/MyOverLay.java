@@ -1,4 +1,4 @@
-package com.triplaud;
+package com.triplaud.overlays;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -12,6 +12,10 @@ import com.google.android.maps.Overlay;
 import com.google.android.maps.Projection;
 
 
+/**
+ * @author Riju
+ * Overlay for drawing directions. This will be called from CommonMapActivity.
+ */
 public class MyOverLay extends Overlay { 
     private GeoPoint gp1; 
     private GeoPoint gp2; 

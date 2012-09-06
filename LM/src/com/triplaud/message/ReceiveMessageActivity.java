@@ -1,4 +1,4 @@
-package com.triplaud;
+package com.triplaud.message;
 
 import greendroid.app.ActionBarActivity;
 import greendroid.app.GDActivity;
@@ -13,6 +13,7 @@ import com.triplaud.alarm.SetAlarm;
 import com.triplaud.common.Common;
 import com.triplaud.common.HttpConnectionHelper;
 import com.triplaud.locationutil.BestLocationFinder;
+import com.triplaud.maps.CommonMapActivity;
 
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
@@ -24,6 +25,11 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
+/**
+ * @author pradeep
+ * Called by the onReceive method of the broadcast receiver. Prompts the user for the location sharing confirmation and
+ * invokes other activities as required.
+ */
 public class ReceiveMessageActivity extends GDActivity implements DialogInterface.OnClickListener{
     private static final String TAG = "ReceiveConfirmDialog";
     private static final int DIALOG_ALERT = 10;

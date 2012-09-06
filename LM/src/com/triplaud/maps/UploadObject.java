@@ -1,4 +1,4 @@
-package com.triplaud;
+package com.triplaud.maps;
 
 import greendroid.app.ActionBarActivity;
 
@@ -12,7 +12,7 @@ import android.location.Location;
 import com.google.android.apps.analytics.GoogleAnalyticsTracker;
 import com.google.android.maps.GeoPoint;
 import com.triplaud.common.Common;
-import com.triplaud.common.SendSms;
+import com.triplaud.message.SendSms;
 
 public class UploadObject {
     /**

@@ -33,14 +33,14 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.RadioButton;
 
-import com.triplaud.CommonMapActivity;
 import com.triplaud.Main;
 import com.triplaud.R;
-import com.triplaud.SearchMapActivity;
 import com.triplaud.common.Common;
 import com.triplaud.common.HttpConnectionHelper;
-import com.triplaud.common.SendSms;
 import com.triplaud.locationutil.BestLocationFinder;
+import com.triplaud.maps.CommonMapActivity;
+import com.triplaud.maps.SearchMapActivity;
+import com.triplaud.message.SendSms;
 
 
 /**

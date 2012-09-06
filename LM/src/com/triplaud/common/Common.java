@@ -4,7 +4,7 @@ package com.triplaud.common;
 import java.util.Calendar;
 import java.util.HashMap;
 
-import com.triplaud.TrackerPoint;
+import com.triplaud.maps.TrackerPoint;
 
 import android.content.Context;
 import android.location.Location;

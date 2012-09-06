@@ -1,4 +1,4 @@
-package com.triplaud;
+package com.triplaud.maps;
 
 import greendroid.app.ActionBarActivity;
 import greendroid.app.GDMapActivity;
@@ -53,9 +53,16 @@ import com.google.android.maps.MapController;
 import com.google.android.maps.MapView;
 import com.google.android.maps.Overlay;
 import com.google.android.maps.OverlayItem;
+import com.triplaud.Main;
+import com.triplaud.R;
+import com.triplaud.R.drawable;
+import com.triplaud.R.id;
+import com.triplaud.R.layout;
 import com.triplaud.common.Common;
 import com.triplaud.common.HttpConnectionHelper;
 import com.triplaud.contacts.InviteContactsActivity;
+import com.triplaud.overlays.DirectionsItemizedOverlay;
+import com.triplaud.overlays.MyOverLay;
 
 /**
  * @author pradeep

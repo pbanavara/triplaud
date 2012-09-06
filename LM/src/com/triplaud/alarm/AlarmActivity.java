@@ -17,12 +17,12 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.triplaud.CommonMapActivity;
 import com.triplaud.MyApplication;
 import com.triplaud.R;
-import com.triplaud.UploadObject;
 import com.triplaud.common.Common;
 import com.triplaud.common.HttpConnectionHelper;
+import com.triplaud.maps.CommonMapActivity;
+import com.triplaud.maps.UploadObject;
 
 /**
  * @author pradeep

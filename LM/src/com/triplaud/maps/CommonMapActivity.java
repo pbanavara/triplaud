@@ -1,4 +1,4 @@
-package com.triplaud;
+package com.triplaud.maps;
 
 import greendroid.app.ActionBarActivity;
 import greendroid.app.GDMapActivity;
@@ -37,13 +37,26 @@ import com.google.android.maps.MapView;
 import com.google.android.maps.MyLocationOverlay;
 import com.google.android.maps.Overlay;
 import com.google.android.maps.OverlayItem;
+import com.triplaud.Main;
+import com.triplaud.R;
+import com.triplaud.R.drawable;
+import com.triplaud.R.id;
+import com.triplaud.R.layout;
 import com.triplaud.common.Common;
 import com.triplaud.common.HttpConnectionHelper;
 import com.triplaud.common.MyFileWriter;
 import com.triplaud.common.Writer;
 import com.triplaud.contacts.InviteContactsActivity;
 import com.triplaud.locationutil.BestLocationFinder;
+import com.triplaud.overlays.FourSquareItemizedOverlay;
+import com.triplaud.overlays.MapItemizedOverlay;
 
+/**
+ * @author pradeep
+ * The main mapping class to display the locations returned from the back-end. Contains an AsynTask class that repeatedly calls the backend
+ * at a specific interval and displays the data using MapOverlays. 
+ * 
+ */
 public class CommonMapActivity extends GDMapActivity{
     private Drawable drawable ;
     private Drawable fsDrawable;
@@ -159,7 +172,7 @@ public class CommonMapActivity extends GDMapActivity{
 
     /**
      * @param mapView
-     * Calls the AsyncTask at an interval of every 4 seconds. This may not be the most efficient implementation.
+     * Calls the AsyncTask at an interval of 5 seconds. This may not be the most efficient implementation.
      */
     public void toCallAsynchronous(final MapView mapView) {
 

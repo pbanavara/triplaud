@@ -30,14 +30,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".SearchMapActivity" >
+        <activity android:name=".maps.SearchMapActivity" >
         </activity>
         <activity android:name=".SingleUserModeActivity" >
         </activity>
         <activity android:name=".contacts.InviteContactsActivity" />
         <activity android:name="com.triplaud.ReceiveMessageActivity" />
         <activity android:name=".common.SendSms" />
-        <activity android:name=".CommonMapActivity" />
+        <activity android:name= ".maps.CommonMapActivityivity" />
         <activity android:name="com.triplaud.MapUs" />
 
         <receiver
@@ -63,7 +63,7 @@
 		</receiver>
         -->
         <activity
-            android:name=".WebViewActivity"
+            android:name=".maps.WebViewActivityivity"
             android:configChanges="keyboardHidden|orientation" >
         </activity>
         <activity

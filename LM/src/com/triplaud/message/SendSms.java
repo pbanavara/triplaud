@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.triplaud.common;
+package com.triplaud.message;
 
 
 import java.util.ArrayList;
@@ -10,6 +10,8 @@ import java.util.Iterator;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import com.triplaud.common.Common;
 
 import android.app.PendingIntent;
 import android.content.Context;

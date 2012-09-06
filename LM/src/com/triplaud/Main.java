@@ -16,7 +16,12 @@ import com.google.android.apps.analytics.GoogleAnalyticsTracker;
 import com.triplaud.common.Common;
 import com.triplaud.contacts.InviteContactsActivity;
 import com.triplaud.locationutil.BestLocationFinder;
+import com.triplaud.maps.SearchMapActivity;
 
+/**
+ * @author pradeep
+ * Main class that displays the home screen.
+ */
 public class Main extends GDActivity {
     // Google analytics code
     GoogleAnalyticsTracker tracker;

@@ -1,4 +1,4 @@
-package com.triplaud;
+package com.triplaud.overlays;
 
 
 import java.util.ArrayList;
@@ -19,7 +19,7 @@ import com.triplaud.common.Common;
  * @author pradeep
  *
  * @param <Item>
- * Customization of ItemizedOerlay to populate icons. The implementation has some known bugs.
+ * Customization of ItemizedOerlay to display directions. The implementation has some known bugs.
  * Refer to this URL on how these are rectified.
  * http://developmentality.wordpress.com/2009/10/19/android-itemizedoverlay-arrayindexoutofboundsexception-nullpointerexception-workarounds/#comment-815
  */

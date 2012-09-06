@@ -1,4 +1,4 @@
-package com.triplaud;
+package com.triplaud.maps;
 
 import com.google.android.maps.GeoPoint;
 

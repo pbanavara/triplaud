@@ -1,4 +1,4 @@
-package com.triplaud;
+package com.triplaud.overlays;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -25,10 +25,14 @@ import android.widget.TimePicker;
 import com.google.android.apps.analytics.GoogleAnalyticsTracker;
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapView;
+import com.triplaud.MyApplication;
+import com.triplaud.R;
+import com.triplaud.R.drawable;
 import com.triplaud.alarm.SetAlarm;
 import com.triplaud.common.Common;
 import com.triplaud.common.HttpConnectionHelper;
-import com.triplaud.common.SendSms;
+import com.triplaud.maps.UploadObject;
+import com.triplaud.message.SendSms;
 
 public class SearchMapOverlay extends com.google.android.maps.Overlay implements DialogInterface.OnClickListener{
     private static final int TIME_DIALOG = 0;

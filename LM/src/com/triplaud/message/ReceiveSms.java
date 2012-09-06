@@ -1,9 +1,9 @@
-package com.triplaud.common;
+package com.triplaud.message;
 
 
 import org.json.JSONObject;
 
-import com.triplaud.ReceiveMessageActivity;
+import com.triplaud.common.Common;
 import com.triplaud.locationutil.BestLocationFinder;
 
 import android.content.BroadcastReceiver;

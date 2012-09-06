@@ -1,4 +1,4 @@
-package com.triplaud;
+package com.triplaud.maps;
 
 import greendroid.app.ActionBarActivity;
 import greendroid.app.GDMapActivity;
@@ -32,11 +32,23 @@ import com.google.android.maps.MapController;
 import com.google.android.maps.MapView;
 import com.google.android.maps.MyLocationOverlay;
 import com.google.android.maps.Overlay;
+import com.triplaud.Main;
+import com.triplaud.MyApplication;
+import com.triplaud.R;
+import com.triplaud.R.drawable;
+import com.triplaud.R.id;
+import com.triplaud.R.layout;
 import com.triplaud.common.Common;
 import com.triplaud.common.Writer;
 import com.triplaud.contacts.InviteContactsActivity;
 import com.triplaud.locationutil.BestLocationFinder;
+import com.triplaud.overlays.MapItemizedOverlay;
+import com.triplaud.overlays.SearchMapOverlay;
 
+/**
+ * @author pradeep
+ * Activity for searching a location.
+ */
 public class SearchMapActivity extends GDMapActivity implements OnClickListener {
     private static final String TAG= "SearchMapActivity";
 
@@ -112,7 +124,7 @@ public class SearchMapActivity extends GDMapActivity implements OnClickListener 
             GeoPoint point = new GeoPoint((int) (loc.getLatitude() * 1000000),(int) (loc.getLongitude() * 1000000));
             mapControl.setCenter(point);
         }
-        Toast.makeText(this, "Your current location is shown, please wait for your friend's locations", Toast.LENGTH_LONG);
+        Toast.makeText(this, "Your current location is shown, please wait for your friend's locations", Toast.LENGTH_LONG).show();
         //Log.i("map ctivity", String.valueOf(point.getLatitudeE6()) + String.valueOf(point.getLongitudeE6()));
         mapView.setBuiltInZoomControls(true);   
 

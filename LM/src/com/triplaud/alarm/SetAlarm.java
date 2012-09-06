@@ -1,7 +1,7 @@
 package com.triplaud.alarm;
 
-import com.triplaud.UploadObject;
 import com.triplaud.common.Common;
+import com.triplaud.maps.UploadObject;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;

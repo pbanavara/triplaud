@@ -1,5 +1,7 @@
 package com.triplaud;
 
+import com.triplaud.maps.UploadObject;
+
 import greendroid.app.GDApplication;
 
 public class MyApplication extends GDApplication {
